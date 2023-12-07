@@ -1,0 +1,22 @@
+.header {
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid black;
+  padding: 5px;
+  gap: 20px;
+}
+.header__navbar {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  font-weight: bold;
+}
+.header__navbar li {
+  padding: 10px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.header__navbar li:hover {
+  color: gray;
+}
