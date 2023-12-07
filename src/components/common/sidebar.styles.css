@@ -7,16 +7,21 @@
 .sidebar__items {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   list-style: none;
 }
 .sidebar__items li {
-  font-size: 10px;
-  padding: 10px;
-  border-radius: 14px;
+  font-size: 20px;
   cursor: pointer;
   font-weight: bold;
 }
 .sidebar__items li:hover {
   color: gray;
+}
+.sidebar__items .navlink {
+  padding: 10px;
+  border-radius: 14px;
+}
+.active {
+  background-color: lightgray;
 }

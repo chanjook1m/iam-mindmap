@@ -8,9 +8,16 @@ import RootLayout from "./layout/RootLayout";
 import Root from "./routes/Root";
 import TestLayout from "./layout/TestLayout";
 import Test from "./routes/Test";
+import Note from "./components/content/Note";
 
 const router = createBrowserRouter([
-  { element: <RootLayout />, children: [{ path: "/", element: <Root /> }] },
+  {
+    element: <RootLayout />,
+    children: [
+      { path: "/", element: <Root /> },
+      { path: "/daynote/:noteId", element: <Note /> },
+    ],
+  },
   { element: <TestLayout />, children: [{ path: "/test", element: <Test /> }] },
 ]);
 
