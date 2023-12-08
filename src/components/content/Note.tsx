@@ -65,7 +65,7 @@ export default function Note() {
             { data: { id: "edge2", source: "node3", target: "node4" } },
           ];
           setData((prev) => {
-            return [...prev];
+            return [...prev, ...nData];
           });
         }}
       >
