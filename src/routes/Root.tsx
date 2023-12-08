@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import cytoscape from "cytoscape";
 
 export default function Root() {
-  const cyRef = useRef();
+  const cyRef = useRef(null);
 
   useEffect(() => {
     const cy = cytoscape({

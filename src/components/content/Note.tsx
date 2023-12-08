@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import cytoscape from "cytoscape";
 import { cystoConfig } from "../../utils/libConfig";
+import { GraphType } from "../../../typings/global";
 
 const element = [
   [
@@ -78,7 +79,7 @@ const element2 = [
 export default function Note() {
   const cyRef = useRef(null);
   const { noteId } = useParams();
-  const [data, setData] = useState({});
+  const [data, setData] = useState<GraphType>();
 
   useEffect(() => {
     setData(() => element[Number(noteId) - 1]); // TODO: get server data
