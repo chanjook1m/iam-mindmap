@@ -105,6 +105,9 @@ export default function Note() {
         style={{ width: "100px", height: "100px" }}
         onClick={() => {
           setData(() => element2[Number(noteId) - 1]);
+          fetch(`${import.meta.env.VITE_API_SERVER}/posts`)
+            .then((res) => res.json())
+            .then((data) => console.log(data));
         }}
       >
         Test
