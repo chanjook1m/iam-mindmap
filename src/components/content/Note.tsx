@@ -4,86 +4,35 @@ import cytoscape from "cytoscape";
 import { cystoConfig } from "../../utils/libConfig";
 import { GraphType } from "../../../typings/global";
 
-const element = [
-  [
-    {
-      data: { id: "node1", label: "Node 1" },
-      position: { x: 100, y: 100 },
-    },
-    {
-      data: { id: "node2", label: "Node 2" },
-      position: { x: 200, y: 200 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-  [
-    {
-      data: { id: "node1", label: "Node 3" },
-      position: { x: 100, y: 200 },
-    },
-    {
-      data: { id: "node2", label: "Node 4" },
-      position: { x: 200, y: 300 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-  [
-    {
-      data: { id: "node1", label: "Node 5" },
-      position: { x: 100, y: 100 },
-    },
-    {
-      data: { id: "node2", label: "Node 6" },
-      position: { x: 200, y: 200 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-];
-
-const element2 = [
-  [
-    {
-      data: { id: "node1", label: "Node 1" },
-      position: { x: 55, y: 55 },
-    },
-    {
-      data: { id: "node2", label: "Node 2" },
-      position: { x: 155, y: 155 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-  [
-    {
-      data: { id: "node1", label: "Node 3" },
-      position: { x: 55, y: 155 },
-    },
-    {
-      data: { id: "node2", label: "Node 4" },
-      position: { x: 155, y: 255 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-  [
-    {
-      data: { id: "node1", label: "Node 5" },
-      position: { x: 55, y: 55 },
-    },
-    {
-      data: { id: "node2", label: "Node 6" },
-      position: { x: 155, y: 155 },
-    },
-    { data: { id: "edge1", source: "node1", target: "node2" } },
-  ],
-];
-
 export default function Note() {
   const cyRef = useRef(null);
   const { noteId } = useParams();
-  const [data, setData] = useState<GraphType>();
+  const [data, setData] = useState<GraphType>([]);
 
   useEffect(() => {
-    setData(() => element[Number(noteId) - 1]); // TODO: get server data
+    const getData = () => {
+      fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("d", data.data);
+          setData(() => data.data);
+        });
+    };
+    // setData(() => element[Number(noteId) - 1]); // TODO: get server data
+    getData();
   }, [noteId]);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  }, [data]);
 
   useEffect(() => {
     const cy = cytoscape({
@@ -104,10 +53,20 @@ export default function Note() {
       <button
         style={{ width: "100px", height: "100px" }}
         onClick={() => {
-          setData(() => element2[Number(noteId) - 1]);
-          fetch(`${import.meta.env.VITE_API_SERVER}/posts`)
-            .then((res) => res.json())
-            .then((data) => console.log(data));
+          const nData = [
+            {
+              data: { id: "node3", label: "Node 3" },
+              position: { x: 100, y: 200 },
+            },
+            {
+              data: { id: "node4", label: "Node 4" },
+              position: { x: 200, y: 300 },
+            },
+            { data: { id: "edge2", source: "node3", target: "node4" } },
+          ];
+          setData((prev) => {
+            return [...prev];
+          });
         }}
       >
         Test
