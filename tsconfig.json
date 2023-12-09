@@ -6,6 +6,11 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "typeRoots": ["./typings", "./node_modules/@types"],
+    "paths": {
+      "cytoscape-cola": ["./typings/cytoscape-cola.d.ts"],
+      "cytoscape-context-menus": ["./typings/cytoscape-context-menus.d.ts"],
+      "cytoscape-dom-node": ["./typings/cytoscape-dom-node.d.ts"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",

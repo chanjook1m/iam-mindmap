@@ -3,12 +3,15 @@ import { useParams } from "react-router-dom";
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
+import domNode from "cytoscape-dom-node";
 
 cytoscape.use(cola);
 cytoscape.use(contextMenus);
+cytoscape.use(domNode);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { cystoConfig, contextMenuOptions } from "../../utils/libConfig";
 import { GraphType } from "../../../typings/global";
+import { Current } from "../../../typings/cytoscape";
 
 export function Note() {
   const cyRef = useRef(null);
@@ -37,6 +40,11 @@ export function Note() {
       style: cystoConfig.style,
       layout: cystoConfig.layout,
     });
+
+    let isTapHoldTriggered = false;
+
+    cy.current.domNode();
+
     contextMenuOptions.menuItems.forEach((menu) => {
       if (menu.id === "remove") {
         menu.onClickFunction = () => {
@@ -51,7 +59,7 @@ export function Note() {
         };
       }
     });
-    const instance = cy.current?.contextMenus(contextMenuOptions);
+    cy.current.contextMenus(contextMenuOptions);
 
     cy.current.on("cxttap", "node", (evt) => {
       const node = evt.target;
@@ -67,14 +75,55 @@ export function Note() {
     });
 
     cy.current?.on("tap", "node", (evt) => {
-      // Check if it's a double tap
-      console.log("taphold");
+      if (isTapHoldTriggered) {
+        isTapHoldTriggered = !isTapHoldTriggered;
+        return;
+      }
+      const node = evt.target;
+      node.select();
+      const targetId = evt.target.data("id");
+      showInput(targetId);
+
+      function showInput(id: string) {
+        // Get the div element
+        const outputDiv = document.getElementById(id);
+        // Create an input element
+        const inputElement = document.createElement("input");
+        inputElement.type = "text";
+
+        // Set the value of the input to the current content of the div
+        (inputElement as HTMLInputElement).value = (
+          outputDiv as HTMLElement
+        ).innerHTML;
+
+        // Replace the div with the input element
+        // outputDiv.replaceWith(inputElement);
+        outputDiv?.appendChild(inputElement);
+        // Focus on the input element
+        inputElement.focus();
+
+        // Add an event listener to handle changes in the input
+        inputElement.addEventListener("focusout", function (event) {
+          (outputDiv as HTMLElement).innerHTML = (
+            event.target as HTMLInputElement
+          ).value;
+          if (outputDiv?.childElementCount)
+            outputDiv?.removeChild(inputElement);
+        });
+      }
     });
     let nodeid = 1;
     cy.current.on("taphold", "node", (evt) => {
+      isTapHoldTriggered = true;
       const currentNodeId = nodeid++;
       const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
 
+      const div = document.createElement("div");
+      div.setAttribute("id", currentNodeId.toString());
+      div.innerHTML = `node-${currentNodeId}`;
+      div.style.minWidth = "min-content";
+      div.style.maxWidth = "max-content";
+      div.style.textAlign = "center";
       cy.current?.nodes().forEach((node) => {
         node.lock();
       });
@@ -84,6 +133,7 @@ export function Note() {
           data: {
             id: currentNodeId.toString(),
             label: "",
+            dom: div,
             // parent: targetId.toString(),
           },
         },
@@ -126,8 +176,8 @@ export function Note() {
           //   return [...prev, ...nData];
           // });
 
-          const edges = cy.current?.json().elements.edges;
-          const nodes = cy.current?.json().elements.nodes;
+          const edges = (cy.current?.json() as Current).elements.edges;
+          const nodes = (cy.current?.json() as Current).elements.nodes;
           const nData = [...edges, ...nodes];
           console.log("json", nData);
           // console.log("working");
