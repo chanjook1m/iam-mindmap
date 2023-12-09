@@ -1,30 +1,37 @@
-export const cystoConfig = {
-  style: [
-    // the stylesheet for the graph
-    {
-      selector: "node",
-      style: {
-        "background-color": "#666",
-        label: "data(label)",
-      },
-    },
+import cytoscape from "cytoscape";
 
-    {
-      selector: "edge",
-      style: {
-        width: 3,
-        "curve-style": "bezier",
-        "line-color": "#ccc",
-        "source-arrow-color": "#ccc",
-        "source-arrow-shape": "vee",
-      },
-    },
-  ],
+export const cystoConfig = {
+  style: cytoscape
+    .stylesheet()
+    .selector("node")
+    .style({
+      label: "data(label)",
+      height: 50,
+      width: 50,
+      "background-fit": "cover",
+      "border-color": "#000",
+      "border-width": 3,
+      "border-opacity": 0.5,
+      "text-wrap": "wrap",
+      "text-halign": "center",
+      "text-valign": "center",
+    })
+    .selector("edge")
+    .style({
+      width: 6,
+      "target-arrow-shape": "triangle",
+      "line-color": "#ffaaaa",
+      "target-arrow-color": "#ffaaaa",
+      "curve-style": "bezier",
+    }),
   layout: {
-    name: "cose",
-    animate: false,
-    gravityRangeCompound: 1.5,
-    fit: true,
-    tile: true,
+    name: "cola",
+    handleDisconnected: true,
+    animate: true,
+    avoidOverlap: true,
+    infinite: false,
+    unconstrIter: 1,
+    userConstIter: 0,
+    allConstIter: 1,
   },
 };

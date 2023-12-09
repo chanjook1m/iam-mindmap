@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import cytoscape from "cytoscape";
+import cola from "cytoscape-cola";
+cytoscape.use(cola);
 import { cystoConfig } from "../../utils/libConfig";
 import { GraphType } from "../../../typings/global";
 
-export default function Note() {
+export function Note() {
   const cyRef = useRef(null);
+  const cy = useRef<cytoscape.Core>();
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
 
@@ -23,55 +26,88 @@ export default function Note() {
   }, [noteId]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-  }, [data]);
-
-  useEffect(() => {
-    const cy = cytoscape({
+    cy.current = cytoscape({
       container: cyRef.current,
       elements: data,
       style: cystoConfig.style,
       layout: cystoConfig.layout,
     });
 
+    let nodeid = 1;
+    cy.current.on("tap", "node", (evt) => {
+      const currentNodeId = nodeid++;
+      const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
+
+      cy.current?.nodes().forEach((node) => {
+        node.lock();
+      });
+      cy.current?.add([
+        {
+          group: "nodes",
+          data: {
+            id: currentNodeId.toString(),
+            label: "",
+          },
+        },
+        {
+          group: "edges",
+          data: {
+            id: currentNodeId + "-edge",
+            source: currentNodeId,
+            target: targetId,
+          },
+        },
+      ]);
+
+      const layout = cy.current?.makeLayout(cystoConfig.layout);
+      layout?.run();
+      layout?.on("layoutstop", () => {
+        cy.current?.nodes().forEach((node) => {
+          node.unlock();
+        });
+      });
+    });
+
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     return () => {
-      cy.destroy();
+      cy?.current?.destroy();
     };
   }, [noteId, data]);
 
   return (
-    <div style={{ height: "500px" }}>
+    <div style={{ height: "100vh" }}>
       <button
-        style={{ width: "100px", height: "100px" }}
+        style={{
+          width: "100px",
+          height: "100px",
+          backgroundColor: "gray",
+          margin: "10px",
+        }}
         onClick={() => {
-          const nData = [
-            {
-              data: { id: "node3", label: "Node 3" },
-              position: { x: 100, y: 200 },
+          // setData((prev) => {
+          //   return [...prev, ...nData];
+          // });
+
+          const edges = cy.current?.json().elements.edges;
+          const nodes = cy.current?.json().elements.nodes;
+          const nData = [...edges, ...nodes];
+          console.log("json", nData);
+          // console.log("working");
+
+          fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-            {
-              data: { id: "node4", label: "Node 4" },
-              position: { x: 200, y: 300 },
-            },
-            { data: { id: "edge2", source: "node3", target: "node4" } },
-          ];
-          setData((prev) => {
-            return [...prev, ...nData];
-          });
+            body: JSON.stringify(nData),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data));
         }}
       >
-        Test
+        Save
       </button>
-      <div ref={cyRef} style={{ width: "100%", height: "400px" }}></div>
+      <div ref={cyRef} style={{ width: "100%", height: "100vh" }}></div>
     </div>
   );
 }
