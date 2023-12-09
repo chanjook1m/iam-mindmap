@@ -19,11 +19,27 @@ export function Note() {
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
 
+  const createNodeDomElement = (id: string, content: string) => {
+    const div = document.createElement("div");
+    div.setAttribute("id", `${id.toString()}`);
+    div.innerHTML = `${content}`;
+    div.style.minWidth = "min-content";
+    div.style.maxWidth = "max-content";
+    div.style.textAlign = "center";
+    return div;
+  };
+
   const getData = () => {
     fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`)
       .then((res) => res.json())
       .then((data) => {
-        // console.log("d", data.data);
+        console.log("d", data.data);
+        data.data.forEach((ele) => {
+          if (ele.data.dom) {
+            const { id, content } = ele.data.dom;
+            ele.data.dom = createNodeDomElement(id, content);
+          }
+        });
         setData(() => data.data);
       });
   };
@@ -118,12 +134,16 @@ export function Note() {
       const currentNodeId = nodeid++;
       const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
 
-      const div = document.createElement("div");
-      div.setAttribute("id", currentNodeId.toString());
-      div.innerHTML = `node-${currentNodeId}`;
-      div.style.minWidth = "min-content";
-      div.style.maxWidth = "max-content";
-      div.style.textAlign = "center";
+      const div = createNodeDomElement(
+        `node-${currentNodeId.toString()}`,
+        `node-${currentNodeId}`
+      );
+      // document.createElement("div");
+      // div.setAttribute("id", `node-${currentNodeId.toString()}`);
+      // div.innerHTML = `node-${currentNodeId}`;
+      // div.style.minWidth = "min-content";
+      // div.style.maxWidth = "max-content";
+      // div.style.textAlign = "center";
       cy.current?.nodes().forEach((node) => {
         node.lock();
       });
@@ -181,6 +201,15 @@ export function Note() {
           const nData = [...edges, ...nodes];
           console.log("json", nData);
           // console.log("working");
+          nData.forEach((ndata) => {
+            if (ndata.data.dom) {
+              const divData = {
+                id: ndata.data.dom.id,
+                content: ndata.data.dom.innerHTML,
+              };
+              ndata.data.dom = divData;
+            }
+          });
 
           fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
             method: "POST",
