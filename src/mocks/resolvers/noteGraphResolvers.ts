@@ -11,7 +11,7 @@ export const getGraphDataResolver: ResponseResolver = async ({ params }) => {
   //   ? JSON.parse(storedData)
   //   : { message: "No data found" };
 
-  return HttpResponse.json({ data: ds[Number(noteId) - 1] });
+  return HttpResponse.json({ data: [{ data: ds[Number(noteId) - 1] }] });
 };
 
 export const updateGraphDataResolver: ResponseResolver = async ({
