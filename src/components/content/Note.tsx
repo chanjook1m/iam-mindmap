@@ -21,7 +21,7 @@ export function Note() {
 
   const createNodeDomElement = (id: string, content: string) => {
     const div = document.createElement("div");
-    div.setAttribute("id", `${id.toString()}`);
+    div.setAttribute("id", `${id}`);
     div.innerHTML = `${content}`;
     div.style.minWidth = "min-content";
     div.style.maxWidth = "max-content";
@@ -32,15 +32,15 @@ export function Note() {
   const getData = () => {
     fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`)
       .then((res) => res.json())
-      .then((data) => {
-        console.log("d", data.data);
-        data.data.forEach((ele) => {
+      .then((json) => {
+        console.log("d", json.data[0].data);
+        json.data[0].data.forEach((ele) => {
           if (ele.data.dom) {
             const { id, content } = ele.data.dom;
             ele.data.dom = createNodeDomElement(id, content);
           }
         });
-        setData(() => data.data);
+        setData(() => json.data[0].data);
       });
   };
   // setData(() => element[Number(noteId) - 1]); // TODO: get server data
@@ -57,20 +57,18 @@ export function Note() {
       layout: cystoConfig.layout,
     });
 
-    let isTapHoldTriggered = false;
-
     cy.current.domNode();
+    let isTapHoldTriggered = false;
 
     contextMenuOptions.menuItems.forEach((menu) => {
       if (menu.id === "remove") {
         menu.onClickFunction = () => {
           const selected = cy.current?.nodes(":selected")[0];
+
           if (selected) {
-            // selected.children().move({
-            //   parent: selected.parent().id() ? selected.parent().id() : null,
-            // });
-            selected.remove();
-            selected.connectedEdges().remove();
+            cy.current?.remove(selected);
+            const layout = cy.current?.makeLayout(cystoConfig.layout);
+            layout?.run();
           }
         };
       }
@@ -96,36 +94,40 @@ export function Note() {
         return;
       }
       const node = evt.target;
-      node.select();
-      const targetId = evt.target.data("id");
+      const targetId = node.data("id");
+      console.log(targetId);
       showInput(targetId);
 
       function showInput(id: string) {
         // Get the div element
-        const outputDiv = document.getElementById(id);
-        // Create an input element
-        const inputElement = document.createElement("input");
-        inputElement.type = "text";
+        const outputDiv = document.getElementById(`node-${id}`);
+        if (outputDiv) {
+          node.select();
 
-        // Set the value of the input to the current content of the div
-        (inputElement as HTMLInputElement).value = (
-          outputDiv as HTMLElement
-        ).innerHTML;
+          // Create an input element
+          const inputElement = document.createElement("input");
+          inputElement.type = "text";
 
-        // Replace the div with the input element
-        // outputDiv.replaceWith(inputElement);
-        outputDiv?.appendChild(inputElement);
-        // Focus on the input element
-        inputElement.focus();
+          // Set the value of the input to the current content of the div
+          (inputElement as HTMLInputElement).value = (
+            outputDiv as HTMLElement
+          ).innerHTML;
 
-        // Add an event listener to handle changes in the input
-        inputElement.addEventListener("focusout", function (event) {
-          (outputDiv as HTMLElement).innerHTML = (
-            event.target as HTMLInputElement
-          ).value;
-          if (outputDiv?.childElementCount)
-            outputDiv?.removeChild(inputElement);
-        });
+          // Replace the div with the input element
+          // outputDiv.replaceWith(inputElement);
+          outputDiv?.appendChild(inputElement);
+          // Focus on the input element
+          inputElement.focus();
+
+          // Add an event listener to handle changes in the input
+          inputElement.addEventListener("focusout", function (event) {
+            (outputDiv as HTMLElement).innerHTML = (
+              event.target as HTMLInputElement
+            ).value;
+            if (outputDiv?.childElementCount)
+              outputDiv?.removeChild(inputElement);
+          });
+        }
       }
     });
     let nodeid = 1;
