@@ -10,7 +10,7 @@ cytoscape.use(contextMenus);
 cytoscape.use(domNode);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { cystoConfig, contextMenuOptions } from "../../utils/libConfig";
-import { GraphType } from "../../../typings/global";
+import { GraphType, NodeType, DomObject } from "../../../typings/global";
 import { Current } from "../../../typings/cytoscape";
 
 export function Note() {
@@ -33,17 +33,26 @@ export function Note() {
     fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`)
       .then((res) => res.json())
       .then((json) => {
-        console.log("d", json.data[0].data);
-        json.data[0].data.forEach((ele) => {
-          if (ele.data.dom) {
-            const { id, content } = ele.data.dom;
-            ele.data.dom = createNodeDomElement(id, content);
-          }
-        });
-        setData(() => json.data[0].data);
-      });
+        if (json?.data[0]?.data) {
+          console.log("d", json.data[0].data);
+          json.data[0].data.forEach((ele: NodeType) => {
+            if (ele.data.dom) {
+              const { id, content } = ele.data.dom as DomObject;
+              ele.data.dom = createNodeDomElement(id, content);
+            }
+          });
+          setData(() => json.data[0].data);
+        } else {
+          const newData: GraphType = [
+            {
+              data: { id: `root-${noteId}`, label: noteId as string },
+            },
+          ];
+          setData(() => newData);
+        }
+      })
+      .catch((err) => console.log(err));
   };
-  // setData(() => element[Number(noteId) - 1]); // TODO: get server data
 
   useEffect(() => {
     getData();
@@ -203,13 +212,14 @@ export function Note() {
           const nData = [...edges, ...nodes];
           console.log("json", nData);
           // console.log("working");
-          nData.forEach((ndata) => {
-            if (ndata.data.dom) {
+          (nData as GraphType).forEach((ndata) => {
+            if ((ndata as NodeType).data.dom) {
               const divData = {
-                id: ndata.data.dom.id,
-                content: ndata.data.dom.innerHTML,
+                id: ((ndata as NodeType).data.dom as HTMLElement).id,
+                content: ((ndata as NodeType).data.dom as HTMLElement)
+                  .innerHTML,
               };
-              ndata.data.dom = divData;
+              (ndata as NodeType).data.dom = divData;
             }
           });
 
@@ -221,7 +231,8 @@ export function Note() {
             body: JSON.stringify(nData),
           })
             .then((res) => res.json())
-            .then((data) => console.log(data));
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
         }}
       >
         Save

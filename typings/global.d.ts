@@ -1,15 +1,20 @@
-type NodeType = {
+export type DomObject = {
+  id: string;
+  content: string;
+};
+export type NodeType = {
   data: {
     id: string;
     label: string;
+    dom?: HTMLElement | DomObject;
   };
-  position: {
+  position?: {
     x: number;
     y: number;
   };
 };
 
-type EdgeType = {
+export type EdgeType = {
   data: { id: string; source: string; target: string };
 };
 
