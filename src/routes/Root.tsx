@@ -1,6 +1,6 @@
 import CustomCalendar from "../components/common/CustomCalendar";
 
-export default function Root() {
+export function Root() {
   return (
     <main className="main">
       <p>일단 리스트로 보여주고 나중에 구체화</p>

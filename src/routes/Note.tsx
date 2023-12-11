@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useLoaderData, useParams } from "react-router-dom";
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
@@ -10,52 +10,35 @@ cytoscape.use(contextMenus);
 cytoscape.use(domNode);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
-import { GraphType, NodeType, DomObject } from "../../typings/global";
+import { GraphType, NodeType } from "../../typings/global";
 import { Current } from "../../typings/cytoscape";
+import { createNodeDomElement, getGraphData, parseToDOM } from "../utils/utils";
+
+export async function loader({ params }) {
+  const json = await getGraphData(params.noteId);
+  const noteData = parseToDOM(json);
+
+  return { noteData };
+}
 
 export function Note() {
   const cyRef = useRef(null);
   const cy = useRef<cytoscape.Core>();
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
-
-  const createNodeDomElement = (id: string, content: string) => {
-    const div = document.createElement("div");
-    div.setAttribute("id", `${id}`);
-    div.innerHTML = `${content}`;
-    div.style.minWidth = "min-content";
-    div.style.maxWidth = "max-content";
-    div.style.textAlign = "center";
-    return div;
-  };
-
-  const getData = () => {
-    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json?.data[0]?.data) {
-          console.log("d", json.data[0].data);
-          json.data[0].data.forEach((ele: NodeType) => {
-            if (ele.data.dom) {
-              const { id, content } = ele.data.dom as DomObject;
-              ele.data.dom = createNodeDomElement(id, content);
-            }
-          });
-          setData(() => json.data[0].data);
-        } else {
-          const newData: GraphType = [
-            {
-              data: { id: `root-${noteId}`, label: noteId as string },
-            },
-          ];
-          setData(() => newData);
-        }
-      })
-      .catch((err) => console.log(err));
-  };
+  const { noteData } = useLoaderData();
 
   useEffect(() => {
-    getData();
+    const initData: GraphType = [
+      {
+        data: { id: `root-${noteId}`, label: noteId as string },
+      },
+    ];
+    setData(initData);
+    if (noteData) {
+      setData(noteData);
+    }
+    // getData();
   }, [noteId]);
 
   useEffect(() => {
@@ -67,6 +50,7 @@ export function Note() {
     });
 
     cy.current.domNode();
+
     let isTapHoldTriggered = false;
 
     contextMenuOptions.menuItems.forEach((menu) => {
@@ -193,6 +177,34 @@ export function Note() {
     };
   }, [data]);
 
+  const saveToServer = () => {
+    const edges = (cy.current?.json() as Current).elements.edges;
+    const nodes = (cy.current?.json() as Current).elements.nodes;
+    const nData = [...edges, ...nodes];
+    console.log("json", nData);
+
+    (nData as GraphType).forEach((ndata) => {
+      if ((ndata as NodeType).data.dom) {
+        const divData = {
+          id: ((ndata as NodeType).data.dom as HTMLElement).id,
+          content: ((ndata as NodeType).data.dom as HTMLElement).innerHTML,
+        };
+        (ndata as NodeType).data.dom = divData;
+      }
+    });
+
+    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(nData),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div style={{ height: "100vh" }}>
       <button
@@ -202,38 +214,7 @@ export function Note() {
           backgroundColor: "gray",
           margin: "10px",
         }}
-        onClick={() => {
-          // setData((prev) => {
-          //   return [...prev, ...nData];
-          // });
-
-          const edges = (cy.current?.json() as Current).elements.edges;
-          const nodes = (cy.current?.json() as Current).elements.nodes;
-          const nData = [...edges, ...nodes];
-          console.log("json", nData);
-          // console.log("working");
-          (nData as GraphType).forEach((ndata) => {
-            if ((ndata as NodeType).data.dom) {
-              const divData = {
-                id: ((ndata as NodeType).data.dom as HTMLElement).id,
-                content: ((ndata as NodeType).data.dom as HTMLElement)
-                  .innerHTML,
-              };
-              (ndata as NodeType).data.dom = divData;
-            }
-          });
-
-          fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(nData),
-          })
-            .then((res) => res.json())
-            .then((data) => console.log(data))
-            .catch((err) => console.log(err));
-        }}
+        onClick={saveToServer}
       >
         Save
       </button>
