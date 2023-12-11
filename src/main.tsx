@@ -8,7 +8,7 @@ import RootLayout from "./layout/RootLayout";
 import Root from "./routes/Root";
 import TestLayout from "./layout/TestLayout";
 import Test from "./routes/Test";
-import { Note } from "./components/content/Note";
+import { Note } from "./routes/Note";
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== "development") {

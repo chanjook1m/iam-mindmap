@@ -1,0 +1,18 @@
+.react-calendar {
+  width: 100%;
+}
+
+/* .react-calendar__navigation {
+  border: 1px solid red;
+  padding: 10px 0 80px 0;
+  background-color: lightskyblue;
+}
+.react-calendar__navigation span,
+.react-calendar__navigation button {
+  font-size: 25px;
+  font-weight: bold;
+} */
+
+.react-calendar__tile {
+  padding: 50px;
+}

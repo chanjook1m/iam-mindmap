@@ -9,9 +9,9 @@ cytoscape.use(cola);
 cytoscape.use(contextMenus);
 cytoscape.use(domNode);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
-import { cystoConfig, contextMenuOptions } from "../../utils/libConfig";
-import { GraphType, NodeType, DomObject } from "../../../typings/global";
-import { Current } from "../../../typings/cytoscape";
+import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
+import { GraphType, NodeType, DomObject } from "../../typings/global";
+import { Current } from "../../typings/cytoscape";
 
 export function Note() {
   const cyRef = useRef(null);
