@@ -15,6 +15,7 @@
     "cytoscape-cola": "^2.5.1",
     "cytoscape-context-menus": "^4.1.0",
     "cytoscape-dom-node": "^1.2.0",
+    "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-calendar": "^4.7.0",

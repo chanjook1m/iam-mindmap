@@ -4,6 +4,7 @@ import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
+import { throttle } from "lodash-es";
 
 cytoscape.use(cola);
 cytoscape.use(contextMenus);
@@ -12,7 +13,13 @@ cytoscape.use(domNode);
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
 import { GraphType, NodeType } from "../../typings/global";
 import { Current } from "../../typings/cytoscape";
-import { createNodeDomElement, getGraphData, parseToDOM } from "../utils/utils";
+import {
+  createNodeDomElement,
+  getGraphData,
+  parseToDOM,
+  rAFThrottle,
+  showInput,
+} from "../utils/utils";
 
 export async function loader({ params }) {
   const json = await getGraphData(params.noteId);
@@ -27,6 +34,34 @@ export function Note() {
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
   const { noteData } = useLoaderData();
+
+  const saveToServer = () => {
+    const edges = (cy.current?.json() as Current).elements.edges;
+    const nodes = (cy.current?.json() as Current).elements.nodes;
+    const nData = [...edges, ...nodes];
+    console.log("json", nData);
+
+    (nData as GraphType).forEach((ndata) => {
+      if ((ndata as NodeType).data.dom) {
+        const divData = {
+          id: ((ndata as NodeType).data.dom as HTMLElement).id,
+          content: ((ndata as NodeType).data.dom as HTMLElement).innerHTML,
+        };
+        (ndata as NodeType).data.dom = divData;
+      }
+    });
+
+    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(nData),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     const initData: GraphType = [
@@ -68,63 +103,27 @@ export function Note() {
     });
     cy.current.contextMenus(contextMenuOptions);
 
-    cy.current.on("cxttap", "node", (evt) => {
+    const cxttapHandler = (evt) => {
       const node = evt.target;
+      const prevNodes = cy.current?.elements();
 
-      // Clear previous selections
-      cy.current?.elements().unselect();
-
-      // Select the right-clicked node
+      prevNodes?.unselect();
       node.select();
+    };
 
-      // // You can perform additional actions here
-      // console.log("Node selected:", node.data());
-    });
-
-    cy.current?.on("tap", "node", (evt) => {
+    const tapHandler = (evt) => {
       if (isTapHoldTriggered) {
         isTapHoldTriggered = !isTapHoldTriggered;
         return;
       }
       const node = evt.target;
       const targetId = node.data("id");
-      console.log(targetId);
-      showInput(targetId);
+      // console.log(targetId);
+      showInput(targetId, saveToServer);
+      saveToServer();
+    };
 
-      function showInput(id: string) {
-        // Get the div element
-        const outputDiv = document.getElementById(`node-${id}`);
-        if (outputDiv) {
-          node.select();
-
-          // Create an input element
-          const inputElement = document.createElement("input");
-          inputElement.type = "text";
-
-          // Set the value of the input to the current content of the div
-          (inputElement as HTMLInputElement).value = (
-            outputDiv as HTMLElement
-          ).innerHTML;
-
-          // Replace the div with the input element
-          // outputDiv.replaceWith(inputElement);
-          outputDiv?.appendChild(inputElement);
-          // Focus on the input element
-          inputElement.focus();
-
-          // Add an event listener to handle changes in the input
-          inputElement.addEventListener("focusout", function (event) {
-            (outputDiv as HTMLElement).innerHTML = (
-              event.target as HTMLInputElement
-            ).value;
-            if (outputDiv?.childElementCount)
-              outputDiv?.removeChild(inputElement);
-          });
-        }
-      }
-    });
-    let nodeid = 1;
-    cy.current.on("taphold", "node", (evt) => {
+    const tapholdHandler = (evt) => {
       isTapHoldTriggered = true;
       const currentNodeId = nodeid++;
       const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
@@ -133,12 +132,7 @@ export function Note() {
         `node-${currentNodeId.toString()}`,
         `node-${currentNodeId}`
       );
-      // document.createElement("div");
-      // div.setAttribute("id", `node-${currentNodeId.toString()}`);
-      // div.innerHTML = `node-${currentNodeId}`;
-      // div.style.minWidth = "min-content";
-      // div.style.maxWidth = "max-content";
-      // div.style.textAlign = "center";
+
       cy.current?.nodes().forEach((node) => {
         node.lock();
       });
@@ -169,41 +163,37 @@ export function Note() {
           node.unlock();
         });
       });
-    });
+      saveToServer();
+    };
+    const throttleOnTap = throttle((evt) => {
+      tapHandler(evt);
+    }, 1500);
+
+    const throttleOnTaphold = throttle((evt) => {
+      tapholdHandler(evt);
+    }, 2000);
+
+    const onTap = (evt) => {
+      throttleOnTap(evt);
+    };
+    const onCxttap = (evt) => {
+      cxttapHandler(evt);
+    };
+    const onTaphold = (evt) => {
+      throttleOnTaphold(evt);
+    };
+
+    cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
+    cy.current?.on("tap", "node", (evt) => onTap(evt));
+
+    let nodeid = 1;
+    cy.current.on("taphold", "node", (evt) => onTaphold(evt));
 
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     return () => {
       cy?.current?.destroy();
     };
   }, [data]);
-
-  const saveToServer = () => {
-    const edges = (cy.current?.json() as Current).elements.edges;
-    const nodes = (cy.current?.json() as Current).elements.nodes;
-    const nData = [...edges, ...nodes];
-    console.log("json", nData);
-
-    (nData as GraphType).forEach((ndata) => {
-      if ((ndata as NodeType).data.dom) {
-        const divData = {
-          id: ((ndata as NodeType).data.dom as HTMLElement).id,
-          content: ((ndata as NodeType).data.dom as HTMLElement).innerHTML,
-        };
-        (ndata as NodeType).data.dom = divData;
-      }
-    });
-
-    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(nData),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
-  };
 
   return (
     <div style={{ height: "100vh" }}>

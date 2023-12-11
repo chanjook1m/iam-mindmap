@@ -28,3 +28,47 @@ export const getGraphData = (id: string) => {
   const res = fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${id}`);
   return res.then((res) => res.json());
 };
+
+export const showInput = (id: string, callback) => {
+  // Get the div element
+  const outputDiv = document.getElementById(`node-${id}`);
+  if (outputDiv) {
+    // Create an input element
+    const inputElement = document.createElement("input");
+    inputElement.type = "text";
+
+    // Set the value of the input to the current content of the div
+    (inputElement as HTMLInputElement).value = (
+      outputDiv as HTMLElement
+    ).innerHTML;
+
+    // Replace the div with the input element
+    // outputDiv.replaceWith(inputElement);
+    outputDiv?.appendChild(inputElement);
+    // Focus on the input element
+    inputElement.focus();
+
+    // Add an event listener to handle changes in the input
+    inputElement.addEventListener("focusout", function (event) {
+      (outputDiv as HTMLElement).innerHTML = (
+        event.target as HTMLInputElement
+      ).value;
+      if (outputDiv?.childElementCount) outputDiv?.removeChild(inputElement);
+      callback();
+    });
+  }
+};
+
+export const rAFThrottle = (callback) => {
+  let requestID;
+
+  return function (...args) {
+    const context = this;
+
+    cancelAnimationFrame(requestID);
+
+    requestID = requestAnimationFrame(() => {
+      callback.call(context, ...args);
+    });
+  };
+};
