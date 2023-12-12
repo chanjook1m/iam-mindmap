@@ -58,17 +58,3 @@ export const showInput = (id: string, callback) => {
     });
   }
 };
-
-export const rAFThrottle = (callback) => {
-  let requestID;
-
-  return function (...args) {
-    const context = this;
-
-    cancelAnimationFrame(requestID);
-
-    requestID = requestAnimationFrame(() => {
-      callback.call(context, ...args);
-    });
-  };
-};

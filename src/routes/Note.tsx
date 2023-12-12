@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLoaderData, useParams } from "react-router-dom";
-import cytoscape from "cytoscape";
+import cytoscape, { InputEventObject } from "cytoscape";
 import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
@@ -17,7 +17,6 @@ import {
   createNodeDomElement,
   getGraphData,
   parseToDOM,
-  rAFThrottle,
   showInput,
 } from "../utils/utils";
 
@@ -103,7 +102,7 @@ export function Note() {
     });
     cy.current.contextMenus(contextMenuOptions);
 
-    const cxttapHandler = (evt) => {
+    const cxttapHandler = (evt: InputEventObject) => {
       const node = evt.target;
       const prevNodes = cy.current?.elements();
 
@@ -111,7 +110,7 @@ export function Note() {
       node.select();
     };
 
-    const tapHandler = (evt) => {
+    const tapHandler = (evt: InputEventObject) => {
       if (isTapHoldTriggered) {
         isTapHoldTriggered = !isTapHoldTriggered;
         return;
@@ -123,7 +122,7 @@ export function Note() {
       saveToServer();
     };
 
-    const tapholdHandler = (evt) => {
+    const tapholdHandler = (evt: InputEventObject) => {
       isTapHoldTriggered = true;
       const currentNodeId = nodeid++;
       const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
@@ -165,21 +164,21 @@ export function Note() {
       });
       saveToServer();
     };
-    const throttleOnTap = throttle((evt) => {
+    const throttleOnTap = throttle((evt: InputEventObject) => {
       tapHandler(evt);
     }, 1500);
 
-    const throttleOnTaphold = throttle((evt) => {
+    const throttleOnTaphold = throttle((evt: InputEventObject) => {
       tapholdHandler(evt);
     }, 2000);
 
-    const onTap = (evt) => {
+    const onTap = (evt: InputEventObject) => {
       throttleOnTap(evt);
     };
-    const onCxttap = (evt) => {
+    const onCxttap = (evt: InputEventObject) => {
       cxttapHandler(evt);
     };
-    const onTaphold = (evt) => {
+    const onTaphold = (evt: InputEventObject) => {
       throttleOnTaphold(evt);
     };
 
