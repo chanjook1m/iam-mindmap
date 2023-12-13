@@ -25,7 +25,11 @@ export const parseToDOM = (json) => {
 };
 
 export const getGraphData = (id: string) => {
-  const res = fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${id}`);
+  const res = fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   return res.then((res) => res.json());
 };
 

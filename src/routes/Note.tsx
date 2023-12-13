@@ -5,6 +5,7 @@ import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
 import { throttle } from "lodash-es";
+import { supabase } from "./SignIn";
 
 cytoscape.use(cola);
 cytoscape.use(contextMenus);
@@ -15,14 +16,19 @@ import { GraphType, NodeType } from "../../typings/global";
 import { Current } from "../../typings/cytoscape";
 import {
   createNodeDomElement,
-  getGraphData,
+  // getGraphData,
   parseToDOM,
   showInput,
 } from "../utils/utils";
 
 export async function loader({ params }) {
-  const json = await getGraphData(params.noteId);
-  const noteData = parseToDOM(json);
+  // const json = await getGraphData(params.noteId);
+  const { data, error } = await supabase
+    .from("graphdata")
+    .select()
+    .eq("date", params.noteId);
+  // console.log(data);
+  const noteData = parseToDOM({ data });
 
   return { noteData };
 }
@@ -30,11 +36,12 @@ export async function loader({ params }) {
 export function Note() {
   const cyRef = useRef(null);
   const cy = useRef<cytoscape.Core>();
+
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
   const { noteData } = useLoaderData();
 
-  const saveToServer = () => {
+  const saveToServer = async () => {
     const edges = (cy.current?.json() as Current).elements.edges;
     const nodes = (cy.current?.json() as Current).elements.nodes;
     const nData = [...edges, ...nodes];
@@ -49,17 +56,20 @@ export function Note() {
         (ndata as NodeType).data.dom = divData;
       }
     });
-
-    fetch(`${import.meta.env.VITE_API_SERVER}/daynote/${noteId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    console.log(nData);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const { data, error } = await supabase.from("graphdata").upsert(
+      {
+        date: noteId,
+        data: nData,
+        user_id: session?.user.id,
       },
-      body: JSON.stringify(nData),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
+      { onConflict: "date" }
+    );
+
+    console.log(error);
   };
 
   useEffect(() => {

@@ -6,11 +6,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import RootLayout from "./layout/RootLayout";
 import { Root } from "./routes/Root";
-import TestLayout from "./layout/TestLayout";
-import Test from "./routes/Test";
+import AuthLayout from "./layout/AuthLayout";
 import { Note } from "./routes/Note";
 
 import { loader as NoteLoader } from "./routes/Note";
+import SignIn from "./routes/SignIn";
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== "development") {
@@ -32,7 +32,10 @@ const router = createBrowserRouter([
       { path: "/daynote/:noteId", element: <Note />, loader: NoteLoader },
     ],
   },
-  { element: <TestLayout />, children: [{ path: "/test", element: <Test /> }] },
+  {
+    element: <AuthLayout />,
+    children: [{ path: "/test", element: <SignIn /> }],
+  },
 ]);
 
 enableMocking().then(() => {
