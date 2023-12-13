@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
-import { Session, createClient } from "@supabase/supabase-js";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useLocation } from "react-router-dom";
-
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_KEY
-);
+import { Session } from "@supabase/supabase-js";
+import { supabase } from "../utils/libConfig";
 
 export default function SignIn() {
   const [session, setSession] = useState<Session | null>(null);
@@ -55,8 +48,6 @@ export default function SignIn() {
         >
           Log out
         </button>
-
-        <div>Logged in!</div>
       </>
     );
   }

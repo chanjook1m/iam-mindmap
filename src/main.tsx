@@ -1,16 +1,20 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 // import App from "./App.tsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import RootLayout from "./layout/RootLayout";
-import { Root } from "./routes/Root";
 import AuthLayout from "./layout/AuthLayout";
+import { Root } from "./routes/Root";
 import { Note } from "./routes/Note";
+import SignIn from "./routes/SignIn";
 
 import { loader as NoteLoader } from "./routes/Note";
-import SignIn from "./routes/SignIn";
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+import NotFound from "./components/common/NotFound";
+import { getUserId } from "./utils/utils";
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== "development") {
@@ -26,7 +30,13 @@ async function enableMocking() {
 
 const router = createBrowserRouter([
   {
-    element: <RootLayout />,
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProtectedRoute uid={getUserId()}>
+          <RootLayout />
+        </ProtectedRoute>
+      </Suspense>
+    ),
     children: [
       { path: "/", element: <Root /> },
       { path: "/daynote/:noteId", element: <Note />, loader: NoteLoader },
@@ -34,7 +44,11 @@ const router = createBrowserRouter([
   },
   {
     element: <AuthLayout />,
-    children: [{ path: "/test", element: <SignIn /> }],
+    children: [{ path: "/signin", element: <SignIn /> }],
+  },
+  {
+    element: <NotFound />,
+    path: "*",
   },
 ]);
 

@@ -5,7 +5,8 @@ import cola from "cytoscape-cola";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
 import { throttle } from "lodash-es";
-import { supabase } from "./SignIn";
+// import { supabase } from "./SignIn";
+import { supabase } from "../utils/libConfig";
 
 cytoscape.use(cola);
 cytoscape.use(contextMenus);
@@ -23,10 +24,14 @@ import {
 
 export async function loader({ params }) {
   // const json = await getGraphData(params.noteId);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const { data, error } = await supabase
     .from("graphdata")
     .select()
-    .eq("date", params.noteId);
+    .eq("date", params.noteId)
+    .eq("user_id", session?.user.id);
   // console.log(data);
   const noteData = parseToDOM({ data });
 

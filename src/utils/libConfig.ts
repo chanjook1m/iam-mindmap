@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js';
 import cytoscape from "cytoscape";
 
 export const cystoConfig = {
@@ -88,3 +89,8 @@ export const contextMenuOptions = {
     height: 12,
   },
 };
+
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_KEY
+);

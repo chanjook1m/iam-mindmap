@@ -1,4 +1,5 @@
 import { DomObject, NodeType } from "../../typings/global";
+import { supabase } from "./libConfig";
 
 export const createNodeDomElement = (id: string, content: string) => {
   const div = document.createElement("div");
@@ -61,4 +62,12 @@ export const showInput = (id: string, callback) => {
       callback();
     });
   }
+};
+
+export const getUserId = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return session?.user.id;
 };
