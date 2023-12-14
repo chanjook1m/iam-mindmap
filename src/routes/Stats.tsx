@@ -9,8 +9,8 @@ export async function loader() {
     .from("graphdata")
     .select()
     .eq("user_id", uid);
-  // const totalData = parseToDOM(data);
-  // console.log(data);
+  const totalData = parseToDOM(data);
+  console.log(totalData);
   // return { totalData };
   return null;
 }
