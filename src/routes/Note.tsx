@@ -213,17 +213,6 @@ export function Note() {
 
   return (
     <div style={{ height: "100vh" }}>
-      <button
-        style={{
-          width: "100px",
-          height: "100px",
-          backgroundColor: "gray",
-          margin: "10px",
-        }}
-        onClick={saveToServer}
-      >
-        Save
-      </button>
       <div ref={cyRef} style={{ width: "100%", height: "100vh" }}></div>
     </div>
   );
