@@ -1,14 +1,14 @@
 import { Navigate } from "react-router-dom";
 
 type ProtectedRouteProps = {
-  uid: Promise<string | undefined>;
   children: React.ReactElement;
 };
 
-export default function ProtectedRoute({ uid, children }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const uid = localStorage.getItem(import.meta.env.VITE_LOCALSTORAGE_KEY);
   console.log(uid);
   if (!uid) {
-    return <Navigate to="/test" />;
+    return <Navigate to="/signin" />;
   }
   return <>{children}</>;
 }

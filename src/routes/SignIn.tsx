@@ -24,13 +24,17 @@ export default function SignIn() {
       <>
         <button
           onClick={() => {
-            supabase.auth.signInWithOAuth({
-              provider: "google",
-              options: {
-                redirectTo: "http://localhost:5173/stats",
-                queryParams: { prompt: "select_account" },
-              },
-            });
+            setTimeout(
+              () =>
+                supabase.auth.signInWithOAuth({
+                  provider: "google",
+                  options: {
+                    redirectTo: "http://localhost:5173/stats",
+                    queryParams: { prompt: "select_account" },
+                  },
+                }),
+              2000
+            );
           }}
           style={{ backgroundColor: "skyblue", color: "white" }}
         >

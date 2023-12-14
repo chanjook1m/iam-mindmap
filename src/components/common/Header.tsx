@@ -44,7 +44,7 @@ export default function Header() {
             className="header__controller__logout"
             onClick={async () => {
               await supabase.auth.signOut();
-              setUid(undefined);
+              navigate(0);
             }}
           >
             Logout

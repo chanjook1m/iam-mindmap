@@ -33,11 +33,9 @@ async function enableMocking() {
 const router = createBrowserRouter([
   {
     element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <ProtectedRoute uid={getUserId()}>
-          <RootLayout />
-        </ProtectedRoute>
-      </Suspense>
+      <ProtectedRoute>
+        <RootLayout />
+      </ProtectedRoute>
     ),
     children: [
       { path: "/", element: <Root /> },
