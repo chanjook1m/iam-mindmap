@@ -3,6 +3,7 @@ import "./sidebar.styles.css";
 import { useEffect, useState } from "react";
 import { getUserId, parseToDOM } from "../../utils/utils";
 import { supabase } from "../../utils/libConfig";
+import { GraphType, NodeType } from "../../../typings/global";
 
 type dataType = {
   id: number;
@@ -15,12 +16,12 @@ type navLinkType = {
 };
 
 export default function SideBar() {
-  // const data: dataType[] = [
-  //   { id: 1, date: "2022-02-01" },
-  //   { id: 2, date: "2022-02-02" },
-  //   { id: 3, date: "2022-02-03" },
-  // ];
-  const [data, setData] = useState<dataType[]>();
+  const [data, setData] = useState<GraphType[]>();
+
+  const updateData = (newData: NodeType) => {
+    if (data?.length) setData((prev) => [...prev, newData]);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const uid = await getUserId();
@@ -34,6 +35,23 @@ export default function SideBar() {
       setData(totalData);
     };
     fetchData();
+
+    // Supbase realtime db set up
+    // Handle inserts
+    const handleInserts = (payload) => {
+      console.log("Insert received!", payload.new);
+      updateData(payload.new);
+    };
+
+    // Listen to inserts
+    supabase
+      .channel("graphdata")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "graphdata" },
+        handleInserts
+      )
+      .subscribe();
   }, []);
   return (
     <aside className="sidebar">
