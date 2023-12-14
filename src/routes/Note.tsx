@@ -17,24 +17,24 @@ import { GraphType, NodeType } from "../../typings/global";
 import { Current } from "../../typings/cytoscape";
 import {
   createNodeDomElement,
+  getUserId,
   // getGraphData,
   parseToDOM,
   showInput,
 } from "../utils/utils";
+import { userInfo } from "os";
 
 export async function loader({ params }) {
   // const json = await getGraphData(params.noteId);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const uid = await getUserId();
   const { data, error } = await supabase
     .from("graphdata")
     .select()
-    .eq("date", params.noteId)
-    .eq("user_id", session?.user.id);
+    .eq("date", params.noteId.toString())
+    .eq("user_id", uid);
   // console.log(data);
-  const noteData = parseToDOM({ data });
-
+  const noteData = data?.length ? parseToDOM(data)[0].data : [];
+  // console.log(noteData);
   return { noteData };
 }
 
@@ -62,19 +62,19 @@ export function Note() {
       }
     });
     console.log(nData);
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const uid = await getUserId();
+
     const { data, error } = await supabase.from("graphdata").upsert(
       {
         date: noteId,
         data: nData,
-        user_id: session?.user.id,
+        user_id: uid,
+        identifier: `${noteId}-${uid}`,
       },
-      { onConflict: "date" }
+      { onConflict: "identifier" }
     );
 
-    console.log(error);
+    console.log(error, data);
   };
 
   useEffect(() => {
@@ -84,7 +84,8 @@ export function Note() {
       },
     ];
     setData(initData);
-    if (noteData) {
+
+    if (noteData.length) {
       setData(noteData);
     }
     // getData();
@@ -157,6 +158,7 @@ export function Note() {
             id: currentNodeId.toString(),
             label: "",
             dom: div,
+            pNode: targetId.toString(),
             // parent: targetId.toString(),
           },
         },

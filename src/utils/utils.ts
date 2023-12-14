@@ -12,17 +12,28 @@ export const createNodeDomElement = (id: string, content: string) => {
 };
 
 export const parseToDOM = (json) => {
-  if (json?.data[0]?.data) {
-    console.log("d", json.data[0].data);
-    json.data[0].data.forEach((ele: NodeType) => {
-      if (ele.data.dom) {
-        const { id, content } = ele.data.dom as DomObject;
-        ele.data.dom = createNodeDomElement(id, content);
+  console.log(json);
+
+  json.forEach((ele) => {
+    console.log("ele", ele);
+    ele.data.forEach((d: NodeType) => {
+      if (d.data.dom) {
+        const { id, content } = d.data.dom as DomObject;
+        d.data.dom = createNodeDomElement(id, content);
       }
     });
-    return json.data[0].data;
-    // setData(() => json.data[0].data);
-  }
+  });
+  console.log(json);
+  return json;
+  // console.log("d", json.data[0].data);
+  // json.data[0].data.forEach((ele: NodeType) => {
+  //   if (ele.data.dom) {
+  //     const { id, content } = ele.data.dom as DomObject;
+  //     ele.data.dom = createNodeDomElement(id, content);
+  //   }
+  // });
+  // return json.data[0].data;
+  // setData(() => json.data[0].data);
 };
 
 export const getGraphData = (id: string) => {

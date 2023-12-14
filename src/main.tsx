@@ -11,10 +11,12 @@ import { Note } from "./routes/Note";
 import SignIn from "./routes/SignIn";
 
 import { loader as NoteLoader } from "./routes/Note";
+import { loader as StatsLoader } from "./routes/Stats";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import NotFound from "./components/common/NotFound";
 import { getUserId } from "./utils/utils";
+import Stats from "./routes/Stats";
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== "development") {
@@ -40,6 +42,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Root /> },
       { path: "/daynote/:noteId", element: <Note />, loader: NoteLoader },
+      { path: "/stats", element: <Stats />, loader: StatsLoader },
     ],
   },
   {

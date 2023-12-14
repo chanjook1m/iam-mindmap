@@ -3,7 +3,7 @@ import "./header.styles.css";
 export default function Header() {
   const data = [
     { id: 1, path: "/", title: "Calendar" },
-    { id: 2, path: "/view2", title: "View2" },
+    { id: 2, path: "/stats", title: "Stats" },
   ];
   return (
     <nav className="header">
