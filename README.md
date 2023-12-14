@@ -1,30 +1,38 @@
-# React + TypeScript + Vite
+# Iam-Mindmap
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+매일 마인드맵 형태로 생각을 기록해 성장하는 것을 느낄 수 있도록 해주는 서비스 입니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 프로젝트 설명
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- 왜 그 기술을 사용했는지
 
-- Configure the top-level `parserOptions` property like this:
+- 당면했던 문제와 나중에 추가하고 싶은 기능
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## 프로젝트 설치 및 실행 방법
+
+#### 1. 기본 세팅
+
+---
+
+```
+1. supabase 계정생성
+2. graphdata table 생성 (TODO: env로 설정)
+3. graphdata table realtime 기능 켜기
+4. supabase OAuth 설정
+5. .env 파일 생성 후 아래내용 추가
+   1. VITE_API_SERVER
+   2. VITE_SUPABASE_URL
+   3. VITE_SUPABASE_KEY
+   4. VITE_LOCALSTORAGE_KEY
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+#### 2. 설정
+
+```
+1. npm install
+2. npm run dev
+```
