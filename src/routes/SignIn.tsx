@@ -27,7 +27,7 @@ export default function SignIn() {
             supabase.auth.signInWithOAuth({
               provider: "google",
               options: {
-                redirectTo: "http://localhost:5173/daynote/3",
+                redirectTo: "http://localhost:5173/stats",
                 queryParams: { prompt: "select_account" },
               },
             });
@@ -35,18 +35,6 @@ export default function SignIn() {
           style={{ backgroundColor: "skyblue", color: "white" }}
         >
           Sign in with Google
-        </button>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <button
-          onClick={() => {
-            supabase.auth.signOut();
-          }}
-        >
-          Log out
         </button>
       </>
     );

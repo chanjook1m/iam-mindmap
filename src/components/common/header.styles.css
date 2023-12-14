@@ -1,10 +1,16 @@
 .header {
   display: flex;
   align-items: center;
-
+  justify-content: space-between;
   border-bottom: 1px solid black;
-  padding: 5px;
+  padding: 15px 50px;
   gap: 20px;
+}
+.header__logo {
+  cursor: pointer;
+}
+.header__logo:hover {
+  color: gray;
 }
 .header__navbar {
   list-style: none;
@@ -12,11 +18,25 @@
   gap: 20px;
   font-weight: bold;
 }
-.header__navbar li {
+.header__navbar__item {
   padding: 10px;
-  border-radius: 14px;
+  border-radius: 25px;
   cursor: pointer;
+  color: black;
 }
-.header__navbar li:hover {
+.header__navbar__item.active {
+  background-color: #1aefaa;
+  padding: 10px;
+  border-radius: 25px;
+  cursor: pointer;
+  color: white;
+}
+.header__navbar__item:hover {
   color: gray;
+}
+.header__controller__login {
+  border: 1px solid black;
+}
+.header__controller__logout {
+  border: 1px solid black;
 }

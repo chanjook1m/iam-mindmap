@@ -9,27 +9,26 @@ export async function loader() {
     .from("graphdata")
     .select()
     .eq("user_id", uid);
-  const totalData = parseToDOM(data);
+  // const totalData = parseToDOM(data);
   // console.log(data);
-  return { totalData };
+  // return { totalData };
+  return null;
 }
 
 export default function Stats() {
-  const { totalData } = useLoaderData();
-  console.log(totalData);
+  // const { totalData } = useLoaderData();
+  // console.log(totalData);
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div>
-        <p></p>
-        <ul className="brainwords">
-          <li>33% - Frontend</li>
-          <ul>
-            <li>11% - React</li>
-          </ul>
-          <li>22% - Learning</li>
-          <li>11% - German</li>
+    <div>
+      <p></p>
+      <ul className="brainwords">
+        <li>33% - Frontend</li>
+        <ul>
+          <li>11% - React</li>
         </ul>
-      </div>
-    </Suspense>
+        <li>22% - Learning</li>
+        <li>11% - German</li>
+      </ul>
+    </div>
   );
 }
