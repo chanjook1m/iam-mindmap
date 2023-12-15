@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../utils/libConfig";
 import "./signin.styles.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   const [session, setSession] = useState<Session | null>(null);
-
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -20,6 +22,10 @@ export default function SignIn() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (isSignedIn) navigate("/");
+  }, [isSignedIn]);
+
   if (!session) {
     return (
       <>
@@ -32,6 +38,7 @@ export default function SignIn() {
                 queryParams: { prompt: "select_account" },
               },
             });
+            setIsSignedIn(true);
           }}
         >
           <img
