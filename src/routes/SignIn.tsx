@@ -25,8 +25,8 @@ export default function SignIn() {
       <>
         <button
           className="google-signin-button"
-          onClick={() => {
-            supabase.auth.signInWithOAuth({
+          onClick={async () => {
+            await supabase.auth.signInWithOAuth({
               provider: "google",
               options: {
                 redirectTo: window.location.origin + "/stats",
