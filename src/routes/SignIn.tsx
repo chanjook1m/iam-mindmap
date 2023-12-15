@@ -22,10 +22,6 @@ export default function SignIn() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (isSignedIn) navigate("/");
-  }, [isSignedIn]);
-
   if (!session) {
     return (
       <>
@@ -38,7 +34,6 @@ export default function SignIn() {
                 queryParams: { prompt: "select_account" },
               },
             });
-            setIsSignedIn(true);
           }}
         >
           <img
