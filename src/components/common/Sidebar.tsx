@@ -19,7 +19,7 @@ export default function SideBar() {
   const [data, setData] = useState<GraphType[]>();
 
   const updateData = (newData: NodeType) => {
-    if (data?.length) setData((prev) => [...prev, newData]);
+    setData((prev) => [...prev, newData]);
   };
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function SideBar() {
 
     // Listen to inserts
     supabase
-      .channel("graphdata")
+      .channel("graphdata_change")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "graphdata" },
