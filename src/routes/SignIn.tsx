@@ -26,17 +26,13 @@ export default function SignIn() {
         <button
           className="google-signin-button"
           onClick={() => {
-            setTimeout(
-              () =>
-                supabase.auth.signInWithOAuth({
-                  provider: "google",
-                  options: {
-                    redirectTo: window.location.origin + "/stats",
-                    queryParams: { prompt: "select_account" },
-                  },
-                }),
-              2000
-            );
+            supabase.auth.signInWithOAuth({
+              provider: "google",
+              options: {
+                redirectTo: window.location.origin + "/stats",
+                queryParams: { prompt: "select_account" },
+              },
+            });
           }}
         >
           <img
