@@ -10,14 +10,14 @@ export default function Header() {
   ];
   const navigate = useNavigate();
   const [uid, setUid] = useState<string | undefined>();
+  const fetchUserId = async () => {
+    const id = await getUserId();
+    setUid(id);
+  };
   useEffect(() => {
-    const fetchUserId = async () => {
-      const id = await getUserId();
-      setUid(id);
-    };
-
     fetchUserId();
   }, []);
+
   return (
     <nav className="header">
       <span className="header__logo"> Logo</span>
@@ -44,6 +44,7 @@ export default function Header() {
             className="header__controller__logout"
             onClick={async () => {
               await supabase.auth.signOut();
+              await fetchUserId();
               navigate(0);
             }}
           >
