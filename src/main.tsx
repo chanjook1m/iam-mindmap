@@ -32,15 +32,34 @@ async function enableMocking() {
 
 const router = createBrowserRouter([
   {
-    element: (
-      <ProtectedRoute>
-        <RootLayout />
-      </ProtectedRoute>
-    ),
+    element: <RootLayout />,
     children: [
-      { path: "/", element: <Root /> },
-      { path: "/daynote/:noteId", element: <Note />, loader: NoteLoader },
-      { path: "/stats", element: <Stats />, loader: StatsLoader },
+      {
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <Root />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/daynote/:noteId",
+        element: (
+          <ProtectedRoute>
+            <Note />
+          </ProtectedRoute>
+        ),
+        loader: NoteLoader,
+      },
+      {
+        path: "/stats",
+        element: (
+          <ProtectedRoute>
+            <Stats />
+          </ProtectedRoute>
+        ),
+        loader: StatsLoader,
+      },
     ],
   },
   {
