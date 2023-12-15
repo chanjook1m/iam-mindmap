@@ -29,7 +29,7 @@ export default function SignIn() {
             supabase.auth.signInWithOAuth({
               provider: "google",
               options: {
-                // redirectTo: window.location.origin + "/stats",
+                redirectTo: window.location.origin + "/stats",
                 queryParams: { prompt: "select_account" },
               },
             });
