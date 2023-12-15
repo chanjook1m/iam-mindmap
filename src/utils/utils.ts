@@ -14,6 +14,7 @@ export const createNodeDomElement = (id: string, content: string) => {
 export const parseToDOM = (json) => {
   console.log(json);
 
+  if (json === null) json = [];
   json?.forEach((ele) => {
     console.log("ele", ele);
     ele.data.forEach((d: NodeType) => {
