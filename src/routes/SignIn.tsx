@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../utils/libConfig";
+import "./signin.styles.css";
 
 export default function SignIn() {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,6 +24,7 @@ export default function SignIn() {
     return (
       <>
         <button
+          className="google-signin-button"
           onClick={() => {
             setTimeout(
               () =>
@@ -36,9 +38,12 @@ export default function SignIn() {
               2000
             );
           }}
-          style={{ backgroundColor: "skyblue", color: "white" }}
         >
-          Sign in with Google
+          <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google logo"
+          />
+          <span>Sign in with Google</span>
         </button>
       </>
     );
