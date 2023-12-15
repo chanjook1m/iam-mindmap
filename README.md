@@ -24,21 +24,33 @@
 
 ```
 1. supabase 계정생성
+```
+```
 2. graphdata table 생성 (TODO: env로 설정해 유동적인 table 명을 생성해 사용가능하도록 설정 필요)
+```
+```
 3. graphdata table realtime 기능 켜기
+```
+```
 4. supabase OAuth 설정 (e.g.구글)
-   1. 구글 cloud console에서 서비스 생성
-   2. clientID 받아온 후 Providers에 해당 정보 입력
-   3. Supabase에서 제공되는 redirect callback 주소를 구글 console의 redirect 주소로 입력 
+   - 구글 cloud console에서 서비스 생성
+   - clientID 받아온 후 Providers에 해당 정보 입력
+   - Supabase에서 제공되는 redirect callback 주소를 구글 console의 redirect 주소로 입력
+   - supabasse url configuration 에서 site url = production url, redirect url = localhost url/** 로 설정
+```
+```
 5. .env 파일 생성 후 아래내용 추가
-   1. VITE_SUPABASE_URL (Supabase 계정 생성 후 제공 됨)
-   2. VITE_SUPABASE_KEY (Supabase 계정 생성 후 제공 됨)
-   3. VITE_LOCALSTORAGE_KEY (클라이언트에서 session 생성 이 후 localStorage에 생성되는 값의 key)
+   - VITE_SUPABASE_URL (Supabase 계정 생성 후 제공 됨)
+   - VITE_SUPABASE_KEY (Supabase 계정 생성 후 제공 됨)
+   - VITE_LOCALSTORAGE_KEY (클라이언트에서 session 생성 이 후 localStorage에 생성되는 값의 key)
+```
 ```
 
 #### 2. 설정
 
 ```
 1. npm install
+```
+```
 2. npm run dev
 ```
