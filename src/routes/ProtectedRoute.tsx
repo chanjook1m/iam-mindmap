@@ -1,14 +1,29 @@
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../utils/libConfig";
+import { Session } from "@supabase/supabase-js";
 
-type ProtectedRouteProps = {
-  children: React.ReactElement;
-};
+export default function ProtectedRoute({ children }) {
+  const [session, setSession] = useState<Session | null>(
+    supabase.auth.getSession()
+  );
+  const navigate = useNavigate();
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const uid = localStorage.getItem(import.meta.env.VITE_LOCALSTORAGE_KEY);
-  console.log(uid);
-  if (!uid) {
-    return <Navigate to="/signin" />;
-  }
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    return () => {};
+  }, []);
+
+  useEffect(() => {
+    if (!session) {
+      navigate("/signin");
+    }
+  }, [session]);
+
   return <>{children}</>;
 }
