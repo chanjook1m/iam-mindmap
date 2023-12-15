@@ -44,7 +44,6 @@
    - VITE_SUPABASE_KEY (Supabase 계정 생성 후 제공 됨)
    - VITE_LOCALSTORAGE_KEY (클라이언트에서 session 생성 이 후 localStorage에 생성되는 값의 key)
 ```
-```
 
 #### 2. 설정
 
