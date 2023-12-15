@@ -20,7 +20,7 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (isSignedOut) navigate(0);
+    if (isSignedOut) navigate("/signin");
   }, [isSignedOut]);
 
   return (
