@@ -23,8 +23,7 @@
     "react": "^18.2.0",
     "react-calendar": "^4.7.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "terser": "^5.26.0"
+    "react-router-dom": "^6.20.1"
   },
   "devDependencies": {
     "@types/cytoscape": "^3.19.16",
