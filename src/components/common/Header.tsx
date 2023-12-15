@@ -10,6 +10,7 @@ export default function Header() {
   ];
   const navigate = useNavigate();
   const [uid, setUid] = useState<string | undefined>();
+  const [isSignedOut, setIsSignedOut] = useState(false);
   const fetchUserId = async () => {
     const id = await getUserId();
     setUid(id);
@@ -17,6 +18,10 @@ export default function Header() {
   useEffect(() => {
     fetchUserId();
   }, []);
+
+  useEffect(() => {
+    if (isSignedOut) navigate(0);
+  }, [isSignedOut]);
 
   return (
     <nav className="header">
@@ -45,7 +50,7 @@ export default function Header() {
             onClick={async () => {
               await supabase.auth.signOut();
               await fetchUserId();
-              navigate(0);
+              setIsSignedOut(true);
             }}
           >
             Logout
