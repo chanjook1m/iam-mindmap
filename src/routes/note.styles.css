@@ -1,0 +1,16 @@
+.node {
+  color: black;
+  width: 150px;
+  font-size: 12px;
+  padding: 5px;
+  min-width: min-content;
+  max-width: max-content;
+  background-color: #6db9ef;
+  border: 1px solid;
+  border-color: #3081d0;
+  cursor: pointer;
+}
+.node:hover {
+  background-color: gray;
+  color: white;
+}

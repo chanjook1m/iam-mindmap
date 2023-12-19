@@ -22,7 +22,8 @@ import {
   parseToDOM,
   showInput,
 } from "../utils/utils";
-import { userInfo } from "os";
+
+import "./note.styles.css";
 
 export async function loader({ params }) {
   // const json = await getGraphData(params.noteId);

@@ -4,10 +4,8 @@ import { supabase } from "./libConfig";
 export const createNodeDomElement = (id: string, content: string) => {
   const div = document.createElement("div");
   div.setAttribute("id", `${id}`);
+  div.setAttribute("class", `node`);
   div.innerHTML = `${content}`;
-  div.style.minWidth = "min-content";
-  div.style.maxWidth = "max-content";
-  div.style.textAlign = "center";
   return div;
 };
 
@@ -69,7 +67,7 @@ export const showInput = (id: string, callback) => {
     inputElement.addEventListener("focusout", function (event) {
       (outputDiv as HTMLElement).innerHTML = (
         event.target as HTMLInputElement
-      ).value;
+      ).value.toString();
       if (outputDiv?.childElementCount) outputDiv?.removeChild(inputElement);
       callback();
     });

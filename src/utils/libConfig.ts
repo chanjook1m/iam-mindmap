@@ -6,13 +6,18 @@ export const cystoConfig = {
     .stylesheet()
     .selector("node")
     .style({
+      shape: "rectangle",
       label: "data(label)",
       height: 50,
-      width: 50,
+      width: 150,
+      color: "white",
       "background-fit": "cover",
-      "border-color": "#000",
+      "background-color": "#3081D0",
+      "border-color": "#3081D0",
       "border-width": 3,
-      "border-opacity": 0.5,
+      "border-radius": 0,
+
+      // "border-opacity": 0.5,
       "text-wrap": "wrap",
       "text-halign": "center",
       "text-valign": "center",
