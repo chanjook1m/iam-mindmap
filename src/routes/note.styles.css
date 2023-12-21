@@ -14,3 +14,27 @@
   background-color: gray;
   color: white;
 }
+
+.tippy-box {
+  background-color: transparent;
+}
+.menu-list {
+  color: black;
+  list-style: none;
+}
+.menu {
+  font-size: 25px;
+
+  margin: 15px;
+  background-color: #facff2;
+  border: 3px solid #fac;
+  padding: 15px;
+  border-radius: 14px;
+  cursor: pointer;
+  min-width: 150px;
+  text-align: center;
+}
+.menu:hover {
+  background-color: gray;
+  color: white;
+}

@@ -18,12 +18,14 @@
     "cytoscape-cola": "^2.5.1",
     "cytoscape-context-menus": "^4.1.0",
     "cytoscape-dom-node": "^1.2.0",
+    "cytoscape-popper": "^2.0.0",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-calendar": "^4.7.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "tippy.js": "^6.2.5"
   },
   "devDependencies": {
     "@types/cytoscape": "^3.19.16",

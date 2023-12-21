@@ -1,5 +1,8 @@
-import { DomObject, NodeType } from "../../typings/global";
-import { supabase } from "./libConfig";
+import tippy from "tippy.js";
+import "tippy.js/dist/tippy.css";
+import { DomObject, GraphType, NodeType } from "../../typings/global";
+import { cystoConfig, supabase } from "./libConfig";
+import { Current } from "../../typings/cytoscape";
 
 export const createNodeDomElement = (id: string, content: string) => {
   const div = document.createElement("div");
@@ -80,4 +83,128 @@ export const getUserId = async () => {
   } = await supabase.auth.getSession();
 
   return session?.user.id;
+};
+
+// ---
+const saveToServer = async (cytoInstance) => {
+  const edges = (cytoInstance.json() as Current).elements.edges;
+  const nodes = (cytoInstance.json() as Current).elements.nodes;
+  const nData = [...edges, ...nodes];
+  console.log("json", nData);
+  const noteId = window.location.href.split("/").at(-1);
+  (nData as GraphType).forEach((ndata) => {
+    if ((ndata as NodeType).data.dom) {
+      const divData = {
+        id: ((ndata as NodeType).data.dom as HTMLElement).id,
+        content: ((ndata as NodeType).data.dom as HTMLElement).innerHTML,
+      };
+      (ndata as NodeType).data.dom = divData;
+    }
+  });
+  console.log(nData);
+  const uid = await getUserId();
+
+  const { data, error } = await supabase.from("graphdata").upsert(
+    {
+      date: noteId,
+      data: nData,
+      user_id: uid,
+      identifier: `${noteId}-${uid}`,
+    },
+    { onConflict: "identifier" }
+  );
+
+  console.log(error, data);
+};
+
+const onClickAdd = (event, cytoInstance, node) => {
+  const currentNodeId = Date.now();
+  const targetId = node.data("id");
+
+  const div = createNodeDomElement(
+    `node-${currentNodeId.toString()}`,
+    `node-${currentNodeId.toString().substring(0, 4)}`
+  );
+
+  cytoInstance.add([
+    {
+      group: "nodes",
+      data: {
+        id: currentNodeId.toString(),
+        label: "",
+        dom: div,
+        pNode: targetId.toString(),
+        // parent: targetId.toString(),
+      },
+    },
+    {
+      group: "edges",
+      data: {
+        id: currentNodeId + "-edge",
+        source: currentNodeId,
+        target: targetId,
+      },
+    },
+  ]);
+
+  const lastNode = cytoInstance.nodes().last();
+  makeNodeToPopper(lastNode, cytoInstance);
+  const layout = cytoInstance.makeLayout(cystoConfig.layout);
+  layout?.run();
+  saveToServer(cytoInstance);
+};
+
+const onClickEdit = (event, cytoInstance, node) => {
+  const targetId = node.data("id");
+  console.log(targetId);
+  showInput(targetId, () => saveToServer(cytoInstance));
+};
+
+const onClickDel = (event, cytoInstance, node) => {
+  // console.log(node._private.data.dom);
+
+  cytoInstance.remove(node);
+  const layout = cytoInstance.makeLayout(cystoConfig.layout);
+  layout?.run();
+};
+
+const menuItem = [
+  { text: "Add", onClick: onClickAdd },
+  { text: "Edit", onClick: onClickEdit },
+  { text: "Del", onClick: onClickDel },
+];
+
+export const makeNodeToPopper = (ele, cytoInstance) => {
+  if (ele) {
+    const ref = ele.popperRef(); // used only for positioning
+
+    const domEle = document.createElement("div");
+    domEle.className = "menu-container";
+    ele.tippy = tippy(domEle, {
+      getReferenceClientRect: ref.getBoundingClientRect,
+      content: () => {
+        const content = document.createElement("div");
+        const ul = document.createElement("ul");
+        ul.className = "menu-list";
+
+        for (let i = 0; i < 3; i++) {
+          const li = document.createElement("li");
+          li.textContent = menuItem[i].text;
+          li.className = `menu menu-${i}`;
+          li.onclick = function (e) {
+            menuItem[i].onClick(e, cytoInstance, ele);
+          };
+          ul.appendChild(li);
+        }
+
+        content.appendChild(ul);
+        return content;
+      },
+      trigger: "manual", // probably want manual mode
+      placement: "right",
+      appendTo: document.body,
+      delay: [0, 2000],
+      interactive: true,
+    });
+  }
 };

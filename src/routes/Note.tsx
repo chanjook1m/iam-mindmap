@@ -7,10 +7,13 @@ import domNode from "cytoscape-dom-node";
 import { throttle } from "lodash-es";
 // import { supabase } from "./SignIn";
 import { supabase } from "../utils/libConfig";
+import popper from "cytoscape-popper";
+import { makeNodeToPopper } from "../utils/utils";
 
 cytoscape.use(cola);
 cytoscape.use(contextMenus);
 cytoscape.use(domNode);
+cytoscape.use(popper);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
 import { GraphType, NodeType } from "../../typings/global";
@@ -35,6 +38,7 @@ export async function loader({ params }) {
     .eq("user_id", uid);
   // console.log(data);
   const noteData = data?.length ? parseToDOM(data)[0].data : [];
+
   // console.log(noteData);
   return { noteData };
 }
@@ -102,7 +106,7 @@ export function Note() {
 
     cy.current.domNode();
 
-    let isTapHoldTriggered = false;
+    const isTapHoldTriggered = false;
 
     contextMenuOptions.menuItems.forEach((menu) => {
       if (menu.id === "remove") {
@@ -127,86 +131,27 @@ export function Note() {
       node.select();
     };
 
-    const tapHandler = (evt: InputEventObject) => {
-      if (isTapHoldTriggered) {
-        isTapHoldTriggered = !isTapHoldTriggered;
-        return;
-      }
-      const node = evt.target;
-      const targetId = node.data("id");
-      // console.log(targetId);
-      showInput(targetId, saveToServer);
-      saveToServer();
-    };
-
-    const tapholdHandler = (evt: InputEventObject) => {
-      isTapHoldTriggered = true;
-      const currentNodeId = nodeid++;
-      const targetId = evt.target.data("id"); //cy.nodes()[Math.floor(Math.random() * cy.nodes().length)].data('id')
-
-      const div = createNodeDomElement(
-        `node-${currentNodeId.toString()}`,
-        `node-${currentNodeId}`
-      );
-
-      cy.current?.nodes().forEach((node) => {
-        node.lock();
-      });
-      cy.current?.add([
-        {
-          group: "nodes",
-          data: {
-            id: currentNodeId.toString(),
-            label: "",
-            dom: div,
-            pNode: targetId.toString(),
-            // parent: targetId.toString(),
-          },
-        },
-        {
-          group: "edges",
-          data: {
-            id: currentNodeId + "-edge",
-            source: currentNodeId,
-            target: targetId,
-          },
-        },
-      ]);
-
-      const layout = cy.current?.makeLayout(cystoConfig.layout);
-      layout?.run();
-      layout?.on("layoutstop", () => {
-        cy.current?.nodes().forEach((node) => {
-          node.unlock();
-        });
-      });
-      saveToServer();
-    };
-    const throttleOnTap = throttle((evt: InputEventObject) => {
-      tapHandler(evt);
-    }, 1500);
-
-    const throttleOnTaphold = throttle((evt: InputEventObject) => {
-      tapholdHandler(evt);
-    }, 2000);
-
-    const onTap = (evt: InputEventObject) => {
-      throttleOnTap(evt);
-    };
     const onCxttap = (evt: InputEventObject) => {
       cxttapHandler(evt);
     };
-    const onTaphold = (evt: InputEventObject) => {
-      throttleOnTaphold(evt);
-    };
 
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
-    cy.current?.on("tap", "node", (evt) => onTap(evt));
 
-    let nodeid = 1;
-    cy.current.on("taphold", "node", (evt) => onTaphold(evt));
+    cy.current.on("mouseover", "node", (event) => {
+      event.target.tippy.show();
+    });
+    cy.current.on("mouseout", "node", (event) => {
+      event.target.tippy.hide();
+    });
 
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
+    cy.current.ready(() => {
+      cy.current.nodes().forEach((node, i) => {
+        // if (i !== 0)
+        makeNodeToPopper(node, cy.current);
+      });
+    });
+
     return () => {
       cy?.current?.destroy();
     };

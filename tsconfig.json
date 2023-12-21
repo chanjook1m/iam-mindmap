@@ -9,7 +9,8 @@
     "paths": {
       "cytoscape-cola": ["./typings/cytoscape-cola.d.ts"],
       "cytoscape-context-menus": ["./typings/cytoscape-context-menus.d.ts"],
-      "cytoscape-dom-node": ["./typings/cytoscape-dom-node.d.ts"]
+      "cytoscape-dom-node": ["./typings/cytoscape-dom-node.d.ts"],
+      "cytoscape-popper": ["./typings/cytoscape-popper.d.ts"]
     },
 
     /* Bundler mode */
