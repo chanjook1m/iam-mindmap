@@ -29,7 +29,7 @@ export default function SideBar() {
         .from("graphdata")
         .select()
         .eq("user_id", uid)
-        .order("date", { ascending: false });
+        .order("updated_at", { ascending: false });
       const totalData = parseToDOM(data);
       console.log(totalData);
       setData(totalData);
@@ -42,6 +42,15 @@ export default function SideBar() {
       console.log("Insert received!", payload.new);
       updateData(payload.new);
     };
+    const handleUpdate = (payload) => {
+      console.log(data);
+      console.log("Update received!", payload.new);
+      setData((prev) => [
+        payload.new,
+        ...prev.filter((item) => item.date !== payload.new.date),
+      ]);
+      // updateData(payload.new);
+    };
 
     // Listen to inserts
     supabase
@@ -50,6 +59,15 @@ export default function SideBar() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "graphdata" },
         handleInserts
+      )
+      .subscribe();
+
+    supabase
+      .channel("graphdata_change")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "graphdata" },
+        handleUpdate
       )
       .subscribe();
   }, []);
