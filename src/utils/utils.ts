@@ -86,9 +86,9 @@ export const getUserId = async () => {
 };
 
 // ---
-const saveToServer = async (cytoInstance) => {
-  const edges = (cytoInstance.json() as Current).elements.edges;
-  const nodes = (cytoInstance.json() as Current).elements.nodes;
+const saveToServer = async (cystoInstance) => {
+  const edges = (cystoInstance.json() as Current).elements.edges;
+  const nodes = (cystoInstance.json() as Current).elements.nodes;
   const nData = [...edges, ...nodes];
   console.log("json", nData);
   const noteId = window.location.href.split("/").at(-1);
@@ -117,7 +117,7 @@ const saveToServer = async (cytoInstance) => {
   console.log(error, data);
 };
 
-const onClickAdd = (event, cytoInstance, node) => {
+const onClickAdd = (event, cystoInstance, node) => {
   const currentNodeId = Date.now();
   const targetId = node.data("id");
 
@@ -126,7 +126,7 @@ const onClickAdd = (event, cytoInstance, node) => {
     `node-${currentNodeId.toString().substring(0, 4)}`
   );
 
-  cytoInstance.add([
+  cystoInstance.add([
     {
       group: "nodes",
       data: {
@@ -147,24 +147,28 @@ const onClickAdd = (event, cytoInstance, node) => {
     },
   ]);
 
-  const lastNode = cytoInstance.nodes().last();
-  makeNodeToPopper(lastNode, cytoInstance);
-  const layout = cytoInstance.makeLayout(cystoConfig.layout);
+  const lastNode = cystoInstance.nodes().last();
+  makeNodeToPopper(lastNode, cystoInstance);
+  cystoInstance.center(node);
+  const layout = cystoInstance.makeLayout(cystoConfig.layout);
   layout?.run();
-  saveToServer(cytoInstance);
+  saveToServer(cystoInstance);
+
+  const lastNodeId = lastNode.data("id");
+  showInput(lastNodeId, () => {});
 };
 
-const onClickEdit = (event, cytoInstance, node) => {
+const onClickEdit = (event, cystoInstance, node) => {
   const targetId = node.data("id");
   console.log(targetId);
-  showInput(targetId, () => saveToServer(cytoInstance));
+  showInput(targetId, () => saveToServer(cystoInstance));
 };
 
-const onClickDel = (event, cytoInstance, node) => {
+const onClickDel = (event, cystoInstance, node) => {
   // console.log(node._private.data.dom);
 
-  cytoInstance.remove(node);
-  const layout = cytoInstance.makeLayout(cystoConfig.layout);
+  cystoInstance.remove(node);
+  const layout = cystoInstance.makeLayout(cystoConfig.layout);
   layout?.run();
 };
 
@@ -174,7 +178,7 @@ const menuItem = [
   { text: "Del", onClick: onClickDel },
 ];
 
-export const makeNodeToPopper = (ele, cytoInstance) => {
+export const makeNodeToPopper = (ele, cystoInstance) => {
   if (ele) {
     const ref = ele.popperRef(); // used only for positioning
 
@@ -192,7 +196,7 @@ export const makeNodeToPopper = (ele, cytoInstance) => {
           li.textContent = menuItem[i].text;
           li.className = `menu menu-${i}`;
           li.onclick = function (e) {
-            menuItem[i].onClick(e, cytoInstance, ele);
+            menuItem[i].onClick(e, cystoInstance, ele);
           };
           ul.appendChild(li);
         }
