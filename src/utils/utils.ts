@@ -119,12 +119,29 @@ const saveToServer = async (cytoInstance) => {
 
 const onClickAdd = (event, cytoInstance, node) => {
   const currentNodeId = Date.now();
+  const tmpCurrentNodeId = Date.now() + 1;
   const targetId = node.data("id");
+  const targetDepth = node.data("depth");
+  const targetParent = node.data("parent");
 
   const div = createNodeDomElement(
     `node-${currentNodeId.toString()}`,
     `node-${currentNodeId.toString().substring(0, 4)}`
   );
+
+  console.log(targetDepth, targetParent, currentNodeId, tmpCurrentNodeId);
+  if (!targetParent) {
+    cytoInstance.add([
+      {
+        group: "nodes",
+        data: {
+          id: tmpCurrentNodeId.toString(),
+          label: "",
+          pNode: "",
+        },
+      },
+    ]);
+  }
 
   cytoInstance.add([
     {
@@ -134,7 +151,8 @@ const onClickAdd = (event, cytoInstance, node) => {
         label: "",
         dom: div,
         pNode: targetId.toString(),
-        // parent: targetId.toString(),
+        depth: targetDepth ? targetDepth + 1 : 1,
+        parent: targetParent ? targetParent : tmpCurrentNodeId.toString(),
       },
     },
     {

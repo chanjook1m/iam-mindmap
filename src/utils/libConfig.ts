@@ -29,16 +29,13 @@ export const cystoConfig = {
       "line-color": "#ffaaaa",
       "target-arrow-color": "#ffaaaa",
       "curve-style": "bezier",
+    })
+    .selector(":parent") // this selects compound nodes (i.e., nodes that have children)
+    .css({
+      "background-color": "#afdfff", // this makes the compound node's rectangle visible
     }),
   layout: {
-    name: "cola",
-    handleDisconnected: true,
-    animate: true,
-    avoidOverlap: true,
-    infinite: false,
-    unconstrIter: 1,
-    userConstIter: 0,
-    allConstIter: 1,
+    name: "fcose",
   },
 };
 

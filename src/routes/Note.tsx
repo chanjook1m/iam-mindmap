@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLoaderData, useParams } from "react-router-dom";
 import cytoscape, { InputEventObject } from "cytoscape";
 import cola from "cytoscape-cola";
+import fcose from "cytoscape-fcose";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
 import { throttle } from "lodash-es";
@@ -10,7 +11,8 @@ import { supabase } from "../utils/libConfig";
 import popper from "cytoscape-popper";
 import { makeNodeToPopper } from "../utils/utils";
 
-cytoscape.use(cola);
+// cytoscape.use(cola);
+cytoscape.use(fcose);
 cytoscape.use(contextMenus);
 cytoscape.use(domNode);
 cytoscape.use(popper);
@@ -85,7 +87,7 @@ export function Note() {
   useEffect(() => {
     const initData: GraphType = [
       {
-        data: { id: `root-${noteId}`, label: noteId as string },
+        data: { id: `root-${noteId}`, label: noteId as string, pNode: "root" },
       },
     ];
     setData(initData);
@@ -138,17 +140,18 @@ export function Note() {
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
 
     cy.current.on("mouseover", "node", (event) => {
-      event.target.tippy.show();
+      const node = event.target;
+      if (node._private.data?.pNode) node.tippy.show();
     });
     cy.current.on("mouseout", "node", (event) => {
-      event.target.tippy.hide();
+      const node = event.target;
+      if (node._private.data?.pNode) node.tippy.hide();
     });
 
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     cy.current.ready(() => {
-      cy.current.nodes().forEach((node, i) => {
-        // if (i !== 0)
-        makeNodeToPopper(node, cy.current);
+      cy.current?.nodes().forEach((node) => {
+        if (node._private.data?.pNode) makeNodeToPopper(node, cy.current);
       });
     });
 
