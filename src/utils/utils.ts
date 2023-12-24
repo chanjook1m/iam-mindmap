@@ -3,6 +3,7 @@ import "tippy.js/dist/tippy.css";
 import { DomObject, GraphType, NodeType } from "../../typings/global";
 import { cystoConfig, supabase } from "./libConfig";
 import { Current } from "../../typings/cytoscape";
+import { stringify } from "flatted";
 
 export const createNodeDomElement = (id: string, content: string) => {
   const div = document.createElement("div");
@@ -102,6 +103,11 @@ const saveToServer = async (cytoInstance) => {
     }
   });
   console.log(nData);
+  try {
+    const test = stringify(nData);
+  } catch (err) {
+    console.log(err);
+  }
   const uid = await getUserId();
 
   const { data, error } = await supabase.from("graphdata").upsert(
@@ -129,6 +135,12 @@ const onClickAdd = (event, cytoInstance, node) => {
     `node-${currentNodeId.toString().substring(0, 4)}`
   );
 
+  const tmpDiv = createNodeDomElement(
+    `node-${tmpCurrentNodeId.toString()}`,
+    ``
+  );
+  tmpDiv.classList.add("hidden");
+
   console.log(targetDepth, targetParent, currentNodeId, tmpCurrentNodeId);
   if (!targetParent) {
     cytoInstance.add([
@@ -137,6 +149,7 @@ const onClickAdd = (event, cytoInstance, node) => {
         data: {
           id: tmpCurrentNodeId.toString(),
           label: "",
+          dom: tmpDiv,
           pNode: "",
         },
       },

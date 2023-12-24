@@ -5,9 +5,13 @@ import cola from "cytoscape-cola";
 import fcose from "cytoscape-fcose";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
+import expandCollapse from "cytoscape-expand-collapse";
+import undoRedo from "cytoscape-undo-redo";
+
+
 import { throttle } from "lodash-es";
 // import { supabase } from "./SignIn";
-import { supabase } from "../utils/libConfig";
+import { expandCollapseOptions, supabase } from "../utils/libConfig";
 import popper from "cytoscape-popper";
 import { makeNodeToPopper } from "../utils/utils";
 
@@ -16,6 +20,9 @@ cytoscape.use(fcose);
 cytoscape.use(contextMenus);
 cytoscape.use(domNode);
 cytoscape.use(popper);
+
+undoRedo(cytoscape);
+expandCollapse(cytoscape);
 // import "cytoscape-context-menus/cytoscape-context-menus.css";
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
 import { GraphType, NodeType } from "../../typings/global";
@@ -107,7 +114,8 @@ export function Note() {
     });
 
     cy.current.domNode();
-
+    const api = cy.current.expandCollapse(expandCollapseOptions);
+    //
     const isTapHoldTriggered = false;
 
     contextMenuOptions.menuItems.forEach((menu) => {
@@ -138,6 +146,11 @@ export function Note() {
     };
 
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
+    cy.current.on("click", "node", (event) => {
+      const node = event.target;
+      // if (api.isExpandable(node)) api.expand(node);
+      // else if (api.isCollapsible(node)) api.collapse(node);
+    });
 
     cy.current.on("mouseover", "node", (event) => {
       const node = event.target;
@@ -147,7 +160,40 @@ export function Note() {
       const node = event.target;
       if (node._private.data?.pNode) node.tippy.hide();
     });
+    cy.current.on("expandcollapse.beforecollapse", "node", function (event) {
+      const node = event.target; // the node that is about to be collapsed
+      const content = node.descendants()[0].data("dom").innerHTML;
+      node.data("dom").classList.remove("hidden");
 
+      node.data("dom").innerHTML = content;
+      node.descendants().forEach((d) => d.data("dom").classList.add("hidden"));
+    });
+
+    cy.current.on("expandcollapse.afterexpand", "node", function (event) {
+      const node = event.target; // the node that is about to be collapsed
+      node.data("dom").classList.add("hidden");
+      node
+        .descendants()
+        .forEach((d) => d.data("dom").classList.remove("hidden"));
+    });
+    cy.current.ready(() => {
+      cy.current.nodes().forEach((node) => {
+        if (api.isCollapsible(node)) {
+          node.data("dom").classList.add("hidden");
+          node
+            .descendants()
+            .forEach((d) => d.data("dom").classList.remove("hidden"));
+        } else if (api.isExpandable(node)) {
+          const content = node.descendants()[0].data("dom").innerHTML;
+          node.data("dom").classList.remove("hidden");
+
+          node.data("dom").innerHTML = content;
+          node
+            .descendants()
+            .forEach((d) => d.data("dom").classList.add("hidden"));
+        }
+      });
+    });
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     cy.current.ready(() => {
       cy.current?.nodes().forEach((node) => {

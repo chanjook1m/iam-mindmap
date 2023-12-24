@@ -38,3 +38,8 @@
   background-color: gray;
   color: white;
 }
+
+.hidden {
+  display: none !important;
+}
+

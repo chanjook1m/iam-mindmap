@@ -33,10 +33,24 @@ export const cystoConfig = {
     .selector(":parent") // this selects compound nodes (i.e., nodes that have children)
     .css({
       "background-color": "#afdfff", // this makes the compound node's rectangle visible
-    }),
+    })
+    .selector("node.cy-expand-collapse-collapsed-node")
+    .css({}),
   layout: {
     name: "fcose",
   },
+};
+
+export const expandCollapseOptions = {
+  layoutBy: {
+    name: "fcose",
+    randomize: false,
+    fit: true,
+  },
+  undoable: true,
+  animate: true,
+  animationDuration: 100,
+  fisheye: true,
 };
 
 export const contextMenuOptions = {
