@@ -134,6 +134,7 @@ const onClickAdd = (event, cytoInstance, node) => {
     `node-${currentNodeId.toString()}`,
     `node-${currentNodeId.toString().substring(0, 4)}`
   );
+  div.classList.add(targetDepth ? `depth-${targetDepth + 1}` : `depth-${1}`);
 
   const tmpDiv = createNodeDomElement(
     `node-${tmpCurrentNodeId.toString()}`,
@@ -167,6 +168,7 @@ const onClickAdd = (event, cytoInstance, node) => {
         depth: targetDepth ? targetDepth + 1 : 1,
         parent: targetParent ? targetParent : tmpCurrentNodeId.toString(),
       },
+      classes: targetDepth ? `depth-${targetDepth + 1}` : `depth-${1}`,
     },
     {
       group: "edges",
@@ -175,6 +177,7 @@ const onClickAdd = (event, cytoInstance, node) => {
         source: currentNodeId,
         target: targetId,
       },
+      classes: targetDepth ? `depth-${targetDepth + 1}` : `depth-${1}`,
     },
   ]);
 

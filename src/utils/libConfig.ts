@@ -1,6 +1,70 @@
 import { createClient } from "@supabase/supabase-js";
 import cytoscape from "cytoscape";
 
+export const cytoDepthColor = [
+  "#5F0F40",
+  "#5F0F40",
+  "#FB8B24",
+  "#E36414",
+  "#9A031E",
+  "#F90716",
+  "#FF5403",
+  "#864000",
+  "#D44000",
+  "#FF7A00",
+  "#DBC",
+  "#EAE",
+  "#C3E",
+];
+
+export const cytoStyle = [
+  {
+    selector: "node",
+    style: {
+      shape: "rectangle",
+      label: "data(label)",
+      height: 50,
+      width: 150,
+      color: "black",
+      "background-fit": "cover",
+      "background-color": "white",
+      "border-color": "#3081D0",
+      "border-width": 3,
+      "border-radius": "14px",
+
+      // "border-opacity": 0.5,
+      cursor: "pointer",
+      "text-wrap": "wrap",
+      "text-halign": "center",
+      "text-valign": "center",
+    },
+  },
+  {
+    selector: "edge",
+    style: {
+      width: 6,
+      // "target-arrow-shape": "triangle",
+      "line-color": "#ffaaaa",
+      "target-arrow-color": "#ffaaaa",
+      // "curve-style": "bezier",
+    },
+  },
+  {
+    selector: "node:selected",
+    style: {
+      "background-color": "gray",
+      color: "white",
+    },
+  },
+  {
+    selector: ":parent",
+    style: {
+      "background-color": "lightgray", // this makes the compound node's rectangle visible
+      "border-color": "#3081df",
+    },
+  },
+];
+
 export const cystoConfig = {
   style: cytoscape
     .stylesheet()
@@ -30,12 +94,15 @@ export const cystoConfig = {
       "target-arrow-color": "#ffaaaa",
       "curve-style": "bezier",
     })
+    .selector("node:selected")
+    .style({
+      "background-color": "gray",
+      color: "white",
+    })
     .selector(":parent") // this selects compound nodes (i.e., nodes that have children)
     .css({
-      "background-color": "#afdfff", // this makes the compound node's rectangle visible
-    })
-    .selector("node.cy-expand-collapse-collapsed-node")
-    .css({}),
+      // "background-color": "#afdfff", // this makes the compound node's rectangle visible
+    }),
   layout: {
     name: "fcose",
   },
