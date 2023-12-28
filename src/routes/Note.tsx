@@ -1,15 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useLoaderData, useParams } from "react-router-dom";
+
 import cytoscape, { InputEventObject } from "cytoscape";
-import cola from "cytoscape-cola";
 import fcose from "cytoscape-fcose";
 import contextMenus from "cytoscape-context-menus";
 import domNode from "cytoscape-dom-node";
 import expandCollapse from "cytoscape-expand-collapse";
 import undoRedo from "cytoscape-undo-redo";
 
-import { throttle } from "lodash-es";
-// import { supabase } from "./SignIn";
 import {
   cytoDepthColor,
   cytoStyle,
@@ -27,22 +25,14 @@ cytoscape.use(popper);
 
 undoRedo(cytoscape);
 expandCollapse(cytoscape);
-// import "cytoscape-context-menus/cytoscape-context-menus.css";
+
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
-import { GraphType, NodeType } from "../../typings/global";
-import { Current } from "../../typings/cytoscape";
-import {
-  createNodeDomElement,
-  getUserId,
-  // getGraphData,
-  parseToDOM,
-  showInput,
-} from "../utils/utils";
+import { GraphType } from "../../typings/global";
+import { getUserId, parseToDOM } from "../utils/utils";
 
 import "./note.styles.css";
 
 export async function loader({ params }) {
-  // const json = await getGraphData(params.noteId);
   const uid = await getUserId();
   const { data, error } = await supabase
     .from("graphdata")
@@ -63,37 +53,6 @@ export function Note() {
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
   const { noteData } = useLoaderData();
-
-  const saveToServer = async () => {
-    const edges = (cy.current?.json() as Current).elements.edges;
-    const nodes = (cy.current?.json() as Current).elements.nodes;
-    const nData = [...edges, ...nodes];
-    console.log("json", nData);
-
-    (nData as GraphType).forEach((ndata) => {
-      if ((ndata as NodeType).data.dom) {
-        const divData = {
-          id: ((ndata as NodeType).data.dom as HTMLElement).id,
-          content: ((ndata as NodeType).data.dom as HTMLElement).innerHTML,
-        };
-        (ndata as NodeType).data.dom = divData;
-      }
-    });
-    console.log(nData);
-    const uid = await getUserId();
-
-    const { data, error } = await supabase.from("graphdata").upsert(
-      {
-        date: noteId,
-        data: nData,
-        user_id: uid,
-        identifier: `${noteId}-${uid}`,
-      },
-      { onConflict: "identifier" }
-    );
-
-    console.log(error, data);
-  };
 
   useEffect(() => {
     const initData: GraphType = [
@@ -122,7 +81,6 @@ export function Note() {
         selector: `edge.depth-${i}`,
         style: {
           "line-color": cytoDepthColor[i],
-          // "target-arrow-color": "#ffaaaa",
         },
       };
       const nodeStyle = {
@@ -137,9 +95,8 @@ export function Note() {
     cy.current.style(cytoStyle);
 
     cy.current.domNode();
+    cy.current.contextMenus(contextMenuOptions);
     const api = cy.current.expandCollapse(expandCollapseOptions);
-    //
-    const isTapHoldTriggered = false;
 
     contextMenuOptions.menuItems.forEach((menu) => {
       if (menu.id === "remove") {
@@ -154,7 +111,6 @@ export function Note() {
         };
       }
     });
-    cy.current.contextMenus(contextMenuOptions);
 
     const cxttapHandler = (evt: InputEventObject) => {
       const node = evt.target;
@@ -177,12 +133,12 @@ export function Note() {
     cy.current.on("click", "node", (event) => {
       const node = event.target;
       const pos = node.position();
-      const zoomLevel = cy.current.zoom();
+      const zoomLevel: number = cy.current!.zoom();
       console.log(zoomLevel);
       if (zoomLevel <= 1) {
-        cy.current?.zoom({ level: 2, position: pos });
+        cy.current!.zoom({ level: 2, position: pos });
       } else {
-        cy.current?.animate({
+        cy.current!.animate({
           zoom: 0.9,
           center: { x: pos.x, y: pos.y },
         });
@@ -209,7 +165,11 @@ export function Note() {
       node.data("dom")?.classList.remove("hidden");
 
       node.data("dom").innerHTML = content;
-      node.descendants().forEach((d) => d.data("dom")?.classList.add("hidden"));
+      node
+        .descendants()
+        .forEach((d: cytoscape.NodeSingular) =>
+          d.data("dom")?.classList.add("hidden")
+        );
     });
 
     cy.current.on("expandcollapse.afterexpand", "node", function (event) {
@@ -217,15 +177,19 @@ export function Note() {
       node.data("dom")?.classList.add("hidden");
       node
         .descendants()
-        .forEach((d) => d.data("dom")?.classList.remove("hidden"));
+        .forEach((d: cytoscape.NodeSingular) =>
+          d.data("dom")?.classList.remove("hidden")
+        );
     });
     cy.current.ready(() => {
-      cy.current.nodes().forEach((node) => {
+      cy.current?.nodes().forEach((node) => {
         if (api.isCollapsible(node)) {
           node.data("dom").classList.add("hidden");
           node
             .descendants()
-            .forEach((d) => d.data("dom").classList.remove("hidden"));
+            .forEach((d: cytoscape.NodeSingular) =>
+              d.data("dom").classList.remove("hidden")
+            );
         } else if (api.isExpandable(node)) {
           const content = node.descendants()[0].data("dom").innerHTML;
           node.data("dom").classList.remove("hidden");
@@ -233,14 +197,16 @@ export function Note() {
           node.data("dom").innerHTML = content;
           node
             .descendants()
-            .forEach((d) => d.data("dom").classList.add("hidden"));
+            .forEach((d: cytoscape.NodeSingular) =>
+              d.data("dom").classList.add("hidden")
+            );
         }
       });
     });
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     cy.current.ready(() => {
-      cy.current?.nodes().forEach((node) => {
-        if (node._private.data?.pNode) makeNodeToPopper(node, cy.current);
+      cy.current?.nodes().forEach((node: cytoscape.NodeSingular) => {
+        if (node._private.data.pNode) makeNodeToPopper(node, cy.current);
       });
     });
 
