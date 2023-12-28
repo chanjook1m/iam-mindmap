@@ -174,6 +174,21 @@ export function Note() {
       node.select();
       node.data("dom").classList.add("selected");
     });
+    cy.current.on("click", "node", (event) => {
+      const node = event.target;
+      const pos = node.position();
+      const zoomLevel = cy.current.zoom();
+      console.log(zoomLevel);
+      if (zoomLevel <= 1) {
+        cy.current?.zoom({ level: 2, position: pos });
+      } else {
+        cy.current?.animate({
+          zoom: 0.9,
+          center: { x: pos.x, y: pos.y },
+        });
+      }
+      cy.current?.fit(event.target, 50); // 50 is the padding
+    });
     cy.current.on("unselect", "node", (event) => {
       const node = event.target;
       node.unselect();
