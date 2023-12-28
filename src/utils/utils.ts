@@ -10,6 +10,7 @@ export const createNodeDomElement = (id: string, content: string) => {
   div.setAttribute("id", `${id}`);
   div.setAttribute("class", `node`);
   div.innerHTML = `${content}`;
+
   return div;
 };
 
@@ -68,6 +69,15 @@ export const showInput = (id: string, callback) => {
     inputElement.focus();
 
     // Add an event listener to handle changes in the input
+    inputElement.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        (outputDiv as HTMLElement).innerHTML = (
+          event.target as HTMLInputElement
+        ).value.toString();
+        if (outputDiv?.childElementCount) outputDiv?.removeChild(inputElement);
+        callback();
+      }
+    });
     inputElement.addEventListener("focusout", function (event) {
       (outputDiv as HTMLElement).innerHTML = (
         event.target as HTMLInputElement
@@ -184,8 +194,8 @@ const onClickAdd = (event, cytoInstance, node) => {
   const lastNode = cytoInstance.nodes().last();
   makeNodeToPopper(lastNode, cytoInstance);
   cytoInstance.center(node);
-  const layout = cytoInstance.makeLayout(cystoConfig.layout);
-  layout?.run();
+  // const layout = cytoInstance.makeLayout(cystoConfig.layout);
+  // layout?.run();
   saveToServer(cytoInstance);
 
   const lastNodeId = lastNode.data("id");
