@@ -23,7 +23,13 @@
   white-space: initial;
   overflow: initial;
 }
-
+.node.writing {
+  height: auto;
+  text-overflow: clip;
+  white-space: initial;
+  overflow: initial;
+  text-align: center;
+}
 .removed {
   display: none !important;
 }

@@ -53,6 +53,7 @@ export const showInput = (id: string, cytoInstance, callback) => {
   // Get the div element
   const outputDiv = document.getElementById(`node-${id}`);
   if (outputDiv) {
+    outputDiv.classList.add("writing");
     // Create an input element
     const inputElement = document.createElement("input");
     inputElement.type = "text";
@@ -71,6 +72,7 @@ export const showInput = (id: string, cytoInstance, callback) => {
     // Add an event listener to handle changes in the input
     inputElement.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
+        outputDiv.classList.remove("writing");
         (outputDiv as HTMLElement).innerHTML = (
           event.target as HTMLInputElement
         ).value.toString();
@@ -81,6 +83,7 @@ export const showInput = (id: string, cytoInstance, callback) => {
       }
     });
     inputElement.addEventListener("focusout", function (event) {
+      outputDiv.classList.remove("writing");
       (outputDiv as HTMLElement).innerHTML = (
         event.target as HTMLInputElement
       ).value.toString();
