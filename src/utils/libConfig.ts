@@ -26,15 +26,13 @@ export const cytoStyle = [
       height: 50,
       width: 150,
       color: "black",
-      "background-fit": "cover",
+
       "background-color": "white",
       "border-color": "#3081D0",
       "border-width": 3,
       "border-radius": "14px",
       "font-size": "25px",
 
-      // "border-opacity": 0.5,
-      "text-wrap": "wrap",
       "text-halign": "center",
       "text-valign": "center",
     },
@@ -45,16 +43,6 @@ export const cytoStyle = [
       label: "",
       "background-color": "lightgray", // this makes the compound node's rectangle visible
       "border-color": "#3081df",
-    },
-  },
-  {
-    selector: "edge",
-    style: {
-      width: 6,
-      // "target-arrow-shape": "triangle",
-      "line-color": "#ffaaaa",
-      "target-arrow-color": "#ffaaaa",
-      // "curve-style": "bezier",
     },
   },
   {
@@ -83,16 +71,13 @@ export const cystoConfig = {
       shape: "rectangle",
       label: "data(label)",
       height: 50,
-      width: 150,
+      width: 200,
       color: "white",
-      "background-fit": "cover",
-      // "background-color": "#3081D0",
+
       "border-color": "#3081D0",
       "border-width": 3,
       "border-radius": 0,
 
-      // "border-opacity": 0.5,
-      "text-wrap": "wrap",
       "text-halign": "center",
       "text-valign": "center",
     })

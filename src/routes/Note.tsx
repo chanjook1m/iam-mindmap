@@ -208,6 +208,8 @@ export function Note() {
       cy.current?.nodes().forEach((node: cytoscape.NodeSingular) => {
         if (node._private.data.pNode) makeNodeToPopper(node, cy.current);
       });
+      const layout = cy.current?.makeLayout(cystoConfig.layout);
+      layout?.run();
     });
 
     return () => {
