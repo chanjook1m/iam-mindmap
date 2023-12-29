@@ -203,7 +203,9 @@ const onClickAdd = (event, cytoInstance, node) => {
   saveToServer(cytoInstance);
 
   const lastNodeId = lastNode.data("id");
-  showInput(lastNodeId, cytoInstance, () => {});
+  showInput(lastNodeId, cytoInstance, () => {
+    saveToServer(cytoInstance);
+  });
 };
 
 const onClickEdit = (event, cytoInstance, node) => {
@@ -220,12 +222,14 @@ const onClickDel = (event, cytoInstance, node) => {
 
   const layout = cytoInstance.makeLayout(cystoConfig.layout);
   layout?.run();
+  saveToServer(cytoInstance);
   // Listen for the Ctrl + Z keypress event
   document.addEventListener("keydown", function (event) {
     if (event.ctrlKey && event.key === "z") {
       node.data("dom").classList.remove("removed");
       ur.undo();
       layout?.run();
+      saveToServer(cytoInstance);
     }
   });
 };
