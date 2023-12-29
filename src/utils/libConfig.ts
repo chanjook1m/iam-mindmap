@@ -31,12 +31,20 @@ export const cytoStyle = [
       "border-color": "#3081D0",
       "border-width": 3,
       "border-radius": "14px",
+      "font-size": "25px",
 
       // "border-opacity": 0.5,
-      cursor: "pointer",
       "text-wrap": "wrap",
       "text-halign": "center",
       "text-valign": "center",
+    },
+  },
+  {
+    selector: ":parent",
+    style: {
+      label: "",
+      "background-color": "lightgray", // this makes the compound node's rectangle visible
+      "border-color": "#3081df",
     },
   },
   {
@@ -50,17 +58,19 @@ export const cytoStyle = [
     },
   },
   {
-    selector: "node:selected",
+    selector: "edge",
     style: {
-      "background-color": "gray",
-      color: "white",
+      width: 6,
+      // "target-arrow-shape": "triangle",
+      "line-color": "#ffaaaa",
+      "target-arrow-color": "#ffaaaa",
+      // "curve-style": "bezier",
     },
   },
   {
-    selector: ":parent",
+    selector: "node.tmp",
     style: {
-      "background-color": "lightgray", // this makes the compound node's rectangle visible
-      "border-color": "#3081df",
+      // "border-color": "lightgray",
     },
   },
 ];
@@ -76,7 +86,7 @@ export const cystoConfig = {
       width: 150,
       color: "white",
       "background-fit": "cover",
-      "background-color": "#3081D0",
+      // "background-color": "#3081D0",
       "border-color": "#3081D0",
       "border-width": 3,
       "border-radius": 0,
@@ -94,13 +104,9 @@ export const cystoConfig = {
       "target-arrow-color": "#ffaaaa",
       "curve-style": "bezier",
     })
-    .selector("node:selected")
-    .style({
-      "background-color": "gray",
-      color: "white",
-    })
     .selector(":parent") // this selects compound nodes (i.e., nodes that have children)
     .css({
+      label: "",
       // "background-color": "#afdfff", // this makes the compound node's rectangle visible
     }),
   layout: {
@@ -109,15 +115,15 @@ export const cystoConfig = {
 };
 
 export const expandCollapseOptions = {
-  layoutBy: {
-    name: "fcose",
-    randomize: false,
-    fit: true,
-  },
-  undoable: true,
-  animate: true,
-  animationDuration: 100,
-  fisheye: true,
+  // layoutBy: {
+  //   name: "fcose",
+  //   randomize: false,
+  //   fit: true,
+  // },
+  // undoable: true,
+  // animate: true,
+  // animationDuration: 100,
+  // fisheye: true,
 };
 
 export const contextMenuOptions = {

@@ -94,9 +94,9 @@ export function Note() {
     }
     cy.current.style(cytoStyle);
 
-    cy.current.domNode();
+    // const api = cy.current.expandCollapse(expandCollapseOptions);
     cy.current.contextMenus(contextMenuOptions);
-    const api = cy.current.expandCollapse(expandCollapseOptions);
+    cy.current.domNode();
 
     contextMenuOptions.menuItems.forEach((menu) => {
       if (menu.id === "remove") {
@@ -182,26 +182,26 @@ export function Note() {
         );
     });
     cy.current.ready(() => {
-      cy.current?.nodes().forEach((node) => {
-        if (api.isCollapsible(node)) {
-          node.data("dom").classList.add("hidden");
-          node
-            .descendants()
-            .forEach((d: cytoscape.NodeSingular) =>
-              d.data("dom").classList.remove("hidden")
-            );
-        } else if (api.isExpandable(node)) {
-          const content = node.descendants()[0].data("dom").innerHTML;
-          node.data("dom").classList.remove("hidden");
-
-          node.data("dom").innerHTML = content;
-          node
-            .descendants()
-            .forEach((d: cytoscape.NodeSingular) =>
-              d.data("dom").classList.add("hidden")
-            );
-        }
-      });
+      // -> expand/collapse function disabled
+      // cy.current?.nodes().forEach((node) => {
+      //   if (api.isCollapsible(node)) {
+      //     node.data("dom").classList.add("hidden");
+      //     node
+      //       .descendants()
+      //       .forEach((d: cytoscape.NodeSingular) =>
+      //         d.data("dom").classList.remove("hidden")
+      //       );
+      //   } else if (api.isExpandable(node)) {
+      //     const content = node.descendants()[0].data("dom").innerHTML;
+      //     node.data("dom").classList.remove("hidden");
+      //     node.data("dom").innerHTML = content;
+      //     node
+      //       .descendants()
+      //       .forEach((d: cytoscape.NodeSingular) =>
+      //         d.data("dom").classList.add("hidden")
+      //       );
+      //   }
+      // });
     });
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     cy.current.ready(() => {

@@ -49,7 +49,7 @@ export const getGraphData = (id: string) => {
   return res.then((res) => res.json());
 };
 
-export const showInput = (id: string, callback) => {
+export const showInput = (id: string, cytoInstance, callback) => {
   // Get the div element
   const outputDiv = document.getElementById(`node-${id}`);
   if (outputDiv) {
@@ -75,6 +75,8 @@ export const showInput = (id: string, callback) => {
           event.target as HTMLInputElement
         ).value.toString();
         if (outputDiv?.childElementCount) outputDiv?.removeChild(inputElement);
+        const layout = cytoInstance.makeLayout(cystoConfig.layout);
+        layout?.run();
         callback();
       }
     });
@@ -83,6 +85,8 @@ export const showInput = (id: string, callback) => {
         event.target as HTMLInputElement
       ).value.toString();
       if (outputDiv?.childElementCount) outputDiv?.removeChild(inputElement);
+      const layout = cytoInstance.makeLayout(cystoConfig.layout);
+      layout?.run();
       callback();
     });
   }
@@ -147,10 +151,10 @@ const onClickAdd = (event, cytoInstance, node) => {
   div.classList.add(targetDepth ? `depth-${targetDepth + 1}` : `depth-${1}`);
 
   const tmpDiv = createNodeDomElement(
-    `node-${tmpCurrentNodeId.toString()}`,
+    `tmpnode-${tmpCurrentNodeId.toString()}`,
     ``
   );
-  tmpDiv.classList.add("hidden");
+  tmpDiv.setAttribute("class", "hidden");
 
   console.log(targetDepth, targetParent, currentNodeId, tmpCurrentNodeId);
   if (!targetParent) {
@@ -163,6 +167,7 @@ const onClickAdd = (event, cytoInstance, node) => {
           dom: tmpDiv,
           pNode: "",
         },
+        classes: "tmp",
       },
     ]);
   }
@@ -193,27 +198,36 @@ const onClickAdd = (event, cytoInstance, node) => {
 
   const lastNode = cytoInstance.nodes().last();
   makeNodeToPopper(lastNode, cytoInstance);
-  cytoInstance.center(node);
-  // const layout = cytoInstance.makeLayout(cystoConfig.layout);
-  // layout?.run();
+  cytoInstance.center(lastNode);
+  cytoInstance.zoom({ level: 2, position: lastNode.position() });
   saveToServer(cytoInstance);
 
   const lastNodeId = lastNode.data("id");
-  showInput(lastNodeId, () => {});
+  showInput(lastNodeId, cytoInstance, () => {});
 };
 
 const onClickEdit = (event, cytoInstance, node) => {
   const targetId = node.data("id");
-  console.log(targetId);
-  showInput(targetId, () => saveToServer(cytoInstance));
+  cytoInstance.center(node);
+  cytoInstance.zoom({ level: 2, position: node.position() });
+  showInput(targetId, cytoInstance, () => saveToServer(cytoInstance));
 };
 
 const onClickDel = (event, cytoInstance, node) => {
-  // console.log(node._private.data.dom);
+  const ur = cytoInstance.undoRedo();
+  node.data("dom").classList.add("removed");
+  ur.do("remove", node);
 
-  cytoInstance.remove(node);
   const layout = cytoInstance.makeLayout(cystoConfig.layout);
   layout?.run();
+  // Listen for the Ctrl + Z keypress event
+  document.addEventListener("keydown", function (event) {
+    if (event.ctrlKey && event.key === "z") {
+      node.data("dom").classList.remove("removed");
+      ur.undo();
+      layout?.run();
+    }
+  });
 };
 
 const menuItem = [
