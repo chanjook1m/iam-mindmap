@@ -4,20 +4,17 @@
   height: 40px;
   font-size: 12px;
   padding: 5px;
-  /* min-width: min-content; */
-  /* max-width: max-content; */
   font-size: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   text-align: center;
   cursor: pointer;
-  z-index: 999;
   transition: font-size 0.1s;
 }
 .node:hover {
   min-width: min-content;
-  max-width: max-content;
+  /* max-width: max-content; */
   background-color: gray;
   color: white;
   font-size: 22px;
@@ -26,6 +23,7 @@
   white-space: initial;
   overflow: initial;
 }
+
 .removed {
   display: none !important;
 }
