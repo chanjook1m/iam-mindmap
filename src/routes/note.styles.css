@@ -1,5 +1,5 @@
 .node {
-  color: black;
+  color: white;
   width: 150px;
   height: 40px;
   font-size: 12px;
@@ -15,7 +15,7 @@
 .node:hover {
   min-width: min-content;
   /* max-width: max-content; */
-  background-color: gray;
+  /* background-color: gray; */
   color: white;
   font-size: 22px;
   height: auto;

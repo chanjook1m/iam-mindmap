@@ -86,7 +86,10 @@ export function Note() {
       const nodeStyle = {
         selector: `node.depth-${i}`,
         style: {
-          "border-color": cytoDepthColor[i],
+          "border-width": 3,
+          "border-color": "black",
+          "background-color": cytoDepthColor[i],
+          opacity: 0.9,
         },
       };
       cytoStyle.push(edgeStyle);
