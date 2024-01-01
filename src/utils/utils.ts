@@ -83,7 +83,7 @@ export const showInput = (id: string, cytoInstance, callback) => {
       }
     });
     inputElement.addEventListener("focusout", function (event) {
-      outputDiv.classList.remove("writing");
+      
       (outputDiv as HTMLElement).innerHTML = (
         event.target as HTMLInputElement
       ).value.toString();

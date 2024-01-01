@@ -52,6 +52,7 @@ export function Note() {
 
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
+  const [collapsed, setCollapsed] = useState(true);
   const { noteData } = useLoaderData();
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export function Note() {
           "border-width": 3,
           "border-color": "black",
           "background-color": cytoDepthColor[i],
-          opacity: 0.9,
+          // opacity: 0.9,
         },
       };
       cytoStyle.push(edgeStyle);
@@ -128,39 +129,83 @@ export function Note() {
     };
 
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
-    cy.current.on("select", "node", (event) => {
-      const node = event.target;
-      node.select();
-      node.data("dom").classList.add("selected");
-    });
+
     cy.current.on("click", "node", (event) => {
       const node = event.target;
-      const pos = node.position();
-      const zoomLevel: number = cy.current!.zoom();
-      console.log(zoomLevel);
-      if (zoomLevel <= 1) {
-        cy.current!.zoom({ level: 2, position: pos });
-      } else {
-        cy.current!.animate({
-          zoom: 0.9,
-          center: { x: pos.x, y: pos.y },
+      if (node.classes()[0] === "tmp") {
+        const pos = node.position();
+        const zoomLevel: number = cy.current!.zoom();
+        // console.log(zoomLevel);
+        if (zoomLevel <= 1) {
+          cy.current!.zoom({ level: 2, position: pos });
+        } else {
+          cy.current!.animate({
+            zoom: 0.9,
+            center: { x: pos.x, y: pos.y },
+          });
+        }
+        cy.current?.fit(event.target, 50); // 50 is the padding
+      } else if (node.classes()[0] !== "tmp") {
+        const connectedEdges = node.connectedEdges().map((edge) => ({
+          data: {
+            source: edge.source().id(),
+            target: edge.target().id(),
+          },
+          style: edge.style(), // 엣지 스타일 저장
+        })); // 연결된 엣지 정보 저장
+        const nodeData = node.data(); // 노드 데이터 저장
+        const nodePosition = node.position(); // 노드 위치 저장
+        const nodeStyle = node.style(); // 노드 스타일 저장
+
+        cy.current!.remove(node); // 노드 제거
+
+        const newNode = cy.current!.add({
+          group: "nodes",
+          data: nodeData,
+          position: nodePosition,
+        }); // 노드 다시 추가
+        connectedEdges.forEach((edgeData) => {
+          if (edgeData.data.source === node.id()) {
+            edgeData.data.source = newNode.id();
+          } else {
+            edgeData.data.target = newNode.id();
+          }
+          const newEdge = cy.current!.add({
+            group: "edges",
+            data: edgeData.data,
+          }); // 엣지 다시 추가
+          newEdge.style(edgeData.style); // 엣지 스타일 복원
         });
+
+        newNode.style(nodeStyle); // 노드 스타일 복원
+        // makeNodeToPopper(newNode, cy.current);
+        // newNode?.tippy?.show();
+        // const layout = cy.current?.makeLayout(cystoConfig.layout);
+        // layout?.run();
+        newNode.data("dom").classList.add("selected");
       }
-      cy.current?.fit(event.target, 50); // 50 is the padding
+    });
+
+    cy.current.on("select", "node", (event) => {
+      const node = event.target;
+      console.log("select");
+      // node.data("dom").classList.add("selected");
+      node.select();
     });
     cy.current.on("unselect", "node", (event) => {
       const node = event.target;
+      // node.data("dom").classList.remove("selected");
       node.unselect();
-      node.data("dom").classList.remove("selected");
+      console.log("unselect");
     });
-
     cy.current.on("mouseover", "node", (event) => {
       const node = event.target;
-      if (node._private.data?.pNode) node.tippy.show();
+      // if (node._private.data?.pNode) node.tippy.show();
     });
     cy.current.on("mouseout", "node", (event) => {
       const node = event.target;
-      if (node._private.data?.pNode) node.tippy.hide();
+
+      // if (node._private.data?.pNode) node.tippy.hide();
     });
     cy.current.on("expandcollapse.beforecollapse", "node", function (event) {
       const node = event.target; // the node that is about to be collapsed
@@ -221,8 +266,17 @@ export function Note() {
   }, [data]);
 
   return (
-    <div style={{ height: "100vh" }}>
-      <div ref={cyRef} style={{ width: "100%", height: "100vh" }}></div>
-    </div>
+    <>
+      <div style={{ height: "100vh" }}>
+        {collapsed && (
+          <div className="sidebarr">
+            <div>Date</div>
+            <div>TextArea</div>
+            <div>Options</div>
+          </div>
+        )}
+        <div ref={cyRef} style={{ width: "100%", height: "100vh" }}></div>
+      </div>
+    </>
   );
 }
