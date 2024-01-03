@@ -145,7 +145,27 @@ export function Note() {
           });
         }
         cy.current?.fit(event.target, 50); // 50 is the padding
-      } else if (node.classes()[0] !== "tmp") {
+      }
+    });
+
+    cy.current.on("select", "node", (event) => {
+      const node = event.target;
+      console.log("select");
+      // node.data("dom").classList.add("selected");
+      node.select();
+    });
+    cy.current.on("unselect", "node", (event) => {
+      const node = event.target;
+      // node.data("dom").classList.remove("selected");
+      node.unselect();
+      console.log("unselect");
+    });
+
+    let isReRendered = false;
+    cy.current.on("mouseover", "node", (event) => {
+      const node = event.target;
+      if (!isReRendered && node.classes()[0] !== "tmp") {
+        isReRendered = true;
         const connectedEdges = node.connectedEdges().map((edge) => ({
           data: {
             source: edge.source().id(),
@@ -185,26 +205,11 @@ export function Note() {
         newNode.data("dom").classList.add("selected");
       }
     });
-
-    cy.current.on("select", "node", (event) => {
-      const node = event.target;
-      console.log("select");
-      // node.data("dom").classList.add("selected");
-      node.select();
-    });
-    cy.current.on("unselect", "node", (event) => {
-      const node = event.target;
-      // node.data("dom").classList.remove("selected");
-      node.unselect();
-      console.log("unselect");
-    });
-    cy.current.on("mouseover", "node", (event) => {
-      const node = event.target;
-      // if (node._private.data?.pNode) node.tippy.show();
-    });
     cy.current.on("mouseout", "node", (event) => {
       const node = event.target;
-
+      setTimeout(() => {
+        isReRendered = false;
+      }, 100);
       // if (node._private.data?.pNode) node.tippy.hide();
     });
     cy.current.on("expandcollapse.beforecollapse", "node", function (event) {
