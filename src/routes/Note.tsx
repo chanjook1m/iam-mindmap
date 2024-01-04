@@ -24,7 +24,7 @@ cytoscape.use(domNode);
 cytoscape.use(popper);
 
 undoRedo(cytoscape);
-expandCollapse(cytoscape);
+// expandCollapse(cytoscape);
 
 import { cystoConfig, contextMenuOptions } from "../utils/libConfig";
 import { GraphType } from "../../typings/global";
@@ -153,7 +153,7 @@ export function Note() {
     let prevNode = null;
     cy.current.on("select", "node", (event) => {
       const node = event.target;
-      console.log(node.classes().length);
+
       if (!node.classes().length) {
         setCollapsed(true);
         node.select();
@@ -195,7 +195,13 @@ export function Note() {
         })); // 연결된 엣지 정보 저장
         const nodeData = node.data(); // 노드 데이터 저장
         const nodePosition = node.position(); // 노드 위치 저장
-        const nodeStyle = node.stylesheet(); // 노드 스타일 저장
+        const tmpStyle = node.style(); // 노드 스타일 저장
+        for (const key in tmpStyle) {
+          if (key.startsWith("pie")) {
+            delete tmpStyle[key];
+          }
+        }
+        const nodeStyle = JSON.parse(JSON.stringify(tmpStyle));
 
         cy.current!.remove(node); // 노드 제거
 
@@ -214,7 +220,14 @@ export function Note() {
             group: "edges",
             data: edgeData.data,
           }); // 엣지 다시 추가
-          newEdge.style(edgeData.style); // 엣지 스타일 복원
+          const tmpStyle = edgeData.style;
+          for (const key in tmpStyle) {
+            if (key.startsWith("pie")) {
+              delete tmpStyle[key];
+            }
+          }
+          const edgeStyle = JSON.parse(JSON.stringify(tmpStyle));
+          newEdge.style(edgeStyle); // 엣지 스타일 복원
         });
 
         newNode.style(nodeStyle); // 노드 스타일 복원
@@ -227,28 +240,28 @@ export function Note() {
       }, 100);
       // if (node._private.data?.pNode) node.tippy.hide();
     });
-    cy.current.on("expandcollapse.beforecollapse", "node", function (event) {
-      const node = event.target; // the node that is about to be collapsed
-      const content = node.descendants()[0].data("dom").innerHTML;
-      node.data("dom")?.classList.remove("hidden");
+    // cy.current.on("expandcollapse.beforecollapse", "node", function (event) {
+    //   const node = event.target; // the node that is about to be collapsed
+    //   const content = node.descendants()[0].data("dom").innerHTML;
+    //   node.data("dom")?.classList.remove("hidden");
 
-      node.data("dom").innerHTML = content;
-      node
-        .descendants()
-        .forEach((d: cytoscape.NodeSingular) =>
-          d.data("dom")?.classList.add("hidden")
-        );
-    });
+    //   node.data("dom").innerHTML = content;
+    //   node
+    //     .descendants()
+    //     .forEach((d: cytoscape.NodeSingular) =>
+    //       d.data("dom")?.classList.add("hidden")
+    //     );
+    // });
 
-    cy.current.on("expandcollapse.afterexpand", "node", function (event) {
-      const node = event.target; // the node that is about to be collapsed
-      node.data("dom")?.classList.add("hidden");
-      node
-        .descendants()
-        .forEach((d: cytoscape.NodeSingular) =>
-          d.data("dom")?.classList.remove("hidden")
-        );
-    });
+    // cy.current.on("expandcollapse.afterexpand", "node", function (event) {
+    //   const node = event.target; // the node that is about to be collapsed
+    //   node.data("dom")?.classList.add("hidden");
+    //   node
+    //     .descendants()
+    //     .forEach((d: cytoscape.NodeSingular) =>
+    //       d.data("dom")?.classList.remove("hidden")
+    //     );
+    // });
     cy.current.ready(() => {
       // -> expand/collapse function disabled
       // cy.current?.nodes().forEach((node) => {
