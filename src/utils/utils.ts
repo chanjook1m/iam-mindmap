@@ -228,7 +228,6 @@ export const onClickDel = (event, cytoInstance, node) => {
 
   const layout = cytoInstance.makeLayout(cystoConfig.layout);
   // layout?.run();
-  saveToServer(cytoInstance);
 
   // Get all nodes with the 'tmp' class
   const tmpNodes = cytoInstance.nodes(".tmp");
@@ -242,6 +241,7 @@ export const onClickDel = (event, cytoInstance, node) => {
       node.remove();
     }
   });
+  saveToServer(cytoInstance);
 
   // Listen for the Ctrl + Z keypress event
   document.addEventListener("keydown", function (event) {
