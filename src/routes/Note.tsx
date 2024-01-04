@@ -31,6 +31,7 @@ import { GraphType } from "../../typings/global";
 import { getUserId, parseToDOM } from "../utils/utils";
 
 import "./note.styles.css";
+import Sidepanel from "../components/Sidepanel";
 
 export async function loader({ params }) {
   const uid = await getUserId();
@@ -52,8 +53,10 @@ export function Note() {
 
   const { noteId } = useParams();
   const [data, setData] = useState<GraphType>([]);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+  const [sidePanelContent, setSidePanelContent] = useState("");
   const { noteData } = useLoaderData();
+  const panelTextAreaRef = useRef(null);
 
   useEffect(() => {
     const initData: GraphType = [
@@ -129,10 +132,10 @@ export function Note() {
     };
 
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
-
     cy.current.on("click", "node", (event) => {
       const node = event.target;
       if (node.classes()[0] === "tmp") {
+        setCollapsed(false);
         const pos = node.position();
         const zoomLevel: number = cy.current!.zoom();
         // console.log(zoomLevel);
@@ -147,18 +150,35 @@ export function Note() {
         cy.current?.fit(event.target, 50); // 50 is the padding
       }
     });
-
+    let prevNode = null;
     cy.current.on("select", "node", (event) => {
       const node = event.target;
-      console.log("select");
-      // node.data("dom").classList.add("selected");
-      node.select();
+      console.log(node.classes().length);
+      if (!node.classes().length) {
+        setCollapsed(true);
+        node.select();
+      } else if (node.classes()[0] !== "tmp") {
+        // node.ungrabify();
+        prevNode?.data("dom")?.classList.remove("selected");
+        node.data("dom").classList.add("selected");
+        cy.current!.center(node);
+        cy.current!.zoom({ level: 2, position: node.position() });
+        setCollapsed(true);
+        setSidePanelContent(node.data("dom").textContent);
+        prevNode = node;
+
+        node.select();
+        node.ungrabify();
+        panelTextAreaRef.current.focus();
+      }
     });
     cy.current.on("unselect", "node", (event) => {
       const node = event.target;
-      // node.data("dom").classList.remove("selected");
+      node.data("dom")?.classList.remove("selected");
       node.unselect();
       console.log("unselect");
+      node.grabify();
+      setCollapsed(false);
     });
 
     let isReRendered = false;
@@ -175,7 +195,7 @@ export function Note() {
         })); // 연결된 엣지 정보 저장
         const nodeData = node.data(); // 노드 데이터 저장
         const nodePosition = node.position(); // 노드 위치 저장
-        const nodeStyle = node.style(); // 노드 스타일 저장
+        const nodeStyle = node.stylesheet(); // 노드 스타일 저장
 
         cy.current!.remove(node); // 노드 제거
 
@@ -198,11 +218,6 @@ export function Note() {
         });
 
         newNode.style(nodeStyle); // 노드 스타일 복원
-        // makeNodeToPopper(newNode, cy.current);
-        // newNode?.tippy?.show();
-        // const layout = cy.current?.makeLayout(cystoConfig.layout);
-        // layout?.run();
-        newNode.data("dom").classList.add("selected");
       }
     });
     cy.current.on("mouseout", "node", (event) => {
@@ -256,6 +271,7 @@ export function Note() {
       //   }
       // });
     });
+
     // console.log(cy.json().elements.edges, cy.json().elements.nodes);
     cy.current.ready(() => {
       cy.current?.nodes().forEach((node: cytoscape.NodeSingular) => {
@@ -274,13 +290,21 @@ export function Note() {
     <>
       <div style={{ height: "100vh" }}>
         {collapsed && (
-          <div className="sidebarr">
-            <div>Date</div>
-            <div>TextArea</div>
-            <div>Options</div>
-          </div>
+          <Sidepanel
+            nodeType={
+              cy.current?.nodes(":selected")[0].data("dom") ? "node" : "root"
+            }
+            content={sidePanelContent}
+            onContentChange={setSidePanelContent}
+            onCollapsed={setCollapsed}
+            textAreaRef={panelTextAreaRef}
+            cytoInstance={cy.current}
+          />
         )}
-        <div ref={cyRef} style={{ width: "100%", height: "100vh" }}></div>
+        <div
+          ref={cyRef}
+          style={{ width: collapsed ? "80%" : "100%", height: "100vh" }}
+        ></div>
       </div>
     </>
   );

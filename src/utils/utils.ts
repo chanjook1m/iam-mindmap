@@ -83,7 +83,6 @@ export const showInput = (id: string, cytoInstance, callback) => {
       }
     });
     inputElement.addEventListener("focusout", function (event) {
-      
       (outputDiv as HTMLElement).innerHTML = (
         event.target as HTMLInputElement
       ).value.toString();
@@ -104,10 +103,18 @@ export const getUserId = async () => {
 };
 
 // ---
-const saveToServer = async (cytoInstance) => {
+export const saveToServer = async (cytoInstance) => {
   const edges = (cytoInstance.json() as Current).elements.edges;
   const nodes = (cytoInstance.json() as Current).elements.nodes;
-  const nData = [...edges, ...nodes];
+
+  const nData =
+    edges && nodes
+      ? [...edges, ...nodes]
+      : edges
+      ? [...edges]
+      : nodes
+      ? [...nodes]
+      : [];
   console.log("json", nData);
   const noteId = window.location.href.split("/").at(-1);
   (nData as GraphType).forEach((ndata) => {
@@ -120,11 +127,7 @@ const saveToServer = async (cytoInstance) => {
     }
   });
   console.log(nData);
-  try {
-    const test = stringify(nData);
-  } catch (err) {
-    console.log(err);
-  }
+
   const uid = await getUserId();
 
   const { data, error } = await supabase.from("graphdata").upsert(
@@ -140,7 +143,7 @@ const saveToServer = async (cytoInstance) => {
   console.log(error, data);
 };
 
-const onClickAdd = (event, cytoInstance, node) => {
+export const onClickAdd = (event, cytoInstance, node) => {
   const currentNodeId = Date.now();
   const tmpCurrentNodeId = Date.now() + 1;
   const targetId = node.data("id");
@@ -167,7 +170,7 @@ const onClickAdd = (event, cytoInstance, node) => {
         data: {
           id: tmpCurrentNodeId.toString(),
           label: "",
-          dom: tmpDiv,
+          dom: null,
           pNode: "",
         },
         classes: "tmp",
@@ -200,7 +203,7 @@ const onClickAdd = (event, cytoInstance, node) => {
   ]);
 
   const lastNode = cytoInstance.nodes().last();
-  makeNodeToPopper(lastNode, cytoInstance);
+  // makeNodeToPopper(lastNode, cytoInstance);
   cytoInstance.center(lastNode);
   cytoInstance.zoom({ level: 2, position: lastNode.position() });
   saveToServer(cytoInstance);
@@ -211,26 +214,40 @@ const onClickAdd = (event, cytoInstance, node) => {
   });
 };
 
-const onClickEdit = (event, cytoInstance, node) => {
+export const onClickEdit = (event, cytoInstance, node) => {
   const targetId = node.data("id");
   cytoInstance.center(node);
   cytoInstance.zoom({ level: 2, position: node.position() });
   showInput(targetId, cytoInstance, () => saveToServer(cytoInstance));
 };
 
-const onClickDel = (event, cytoInstance, node) => {
+export const onClickDel = (event, cytoInstance, node) => {
   const ur = cytoInstance.undoRedo();
   node.data("dom").classList.add("removed");
   ur.do("remove", node);
 
   const layout = cytoInstance.makeLayout(cystoConfig.layout);
-  layout?.run();
+  // layout?.run();
   saveToServer(cytoInstance);
+
+  // Get all nodes with the 'tmp' class
+  const tmpNodes = cytoInstance.nodes(".tmp");
+
+  // Check if each node has children
+  tmpNodes.forEach((node) => {
+    if (node.children().length > 0) {
+      console.log(`Node ${node.id()} has children`);
+    } else {
+      console.log(`Node ${node.id()} has no children`);
+      node.remove();
+    }
+  });
+
   // Listen for the Ctrl + Z keypress event
   document.addEventListener("keydown", function (event) {
     if (event.ctrlKey && event.key === "z") {
-      node.data("dom").classList.remove("removed");
       ur.undo();
+      node.data("dom").classList.remove("removed");
       layout?.run();
       saveToServer(cytoInstance);
     }

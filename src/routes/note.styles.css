@@ -30,13 +30,13 @@
   overflow: initial;
   text-align: center;
 }
+.node.selected {
+  background-color: #5ba4fc;
+  color: black;
+}
 .removed {
   display: none !important;
 }
-/* .node.selected {
-  background-color: gray;
-  color: white;
-} */
 
 .tippy-box {
   background-color: transparent;
@@ -68,18 +68,4 @@
 
 .tmp {
   display: none !important;
-}
-
-.sidebarr {
-  height: 100vh;
-  width: 350px;
-  position: absolute;
-  z-index: 1;
-  top: 10;
-  right: 0;
-  background-color: white;
-  border-left: 3px solid black;
-  overflow-x: hidden;
-  padding-top: 60px;
-  transition: 0.5s;
 }
