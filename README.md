@@ -7,7 +7,8 @@
 ---
 
 ## 프로젝트 설명
-
+- 프로젝트 진행 상황
+[프로젝트링크](https://github.com/users/chanjook1m/projects/1/views/1)
 - 기술 사용 이유
 [Wiki링크](https://github.com/chanjook1m/iam-mindmap/wiki/%EA%B8%B0%EC%88%A0-%EC%84%A0%ED%83%9D-%EC%9D%B4%EC%9C%A0)
 - 마주한 문제
