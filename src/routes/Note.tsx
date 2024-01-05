@@ -151,11 +151,13 @@ export function Note() {
           });
         }
         cy.current?.fit(event.target, 50); // 50 is the padding
+        if (collapsed) setCollapsed(false);
       }
     });
     let prevNode = null;
     cy.current.on("select", "node", (event) => {
       const node = event.target;
+      console.log(node.classes());
 
       if (!node.parent().length) {
         setCollapsed(true);
@@ -199,13 +201,13 @@ export function Note() {
         })); // 연결된 엣지 정보 저장
         const nodeData = node.data(); // 노드 데이터 저장
         const nodePosition = node.position(); // 노드 위치 저장
-        const tmpStyle = node.style(); // 노드 스타일 저장
-        for (const key in tmpStyle) {
-          if (key.startsWith("pie")) {
-            delete tmpStyle[key];
-          }
-        }
-        const nodeStyle = JSON.parse(JSON.stringify(tmpStyle));
+        // const tmpStyle = node.style(); // 노드 스타일 저장
+        // for (const key in tmpStyle) {
+        //   if (key.startsWith("pie")) {
+        //     delete tmpStyle[key];
+        //   }
+        // }
+        const nodeStyle = node.stylesheet(); ///JSON.parse(JSON.stringify(tmpStyle));
 
         cy.current!.remove(node); // 노드 제거
 
@@ -224,14 +226,14 @@ export function Note() {
             group: "edges",
             data: edgeData.data,
           }); // 엣지 다시 추가
-          const tmpStyle = edgeData.style;
-          for (const key in tmpStyle) {
-            if (key.startsWith("pie")) {
-              delete tmpStyle[key];
-            }
-          }
-          const edgeStyle = JSON.parse(JSON.stringify(tmpStyle));
-          newEdge.style(edgeStyle); // 엣지 스타일 복원
+          // const tmpStyle = edgeData.style;
+          // for (const key in tmpStyle) {
+          //   if (key.startsWith("pie")) {
+          //     delete tmpStyle[key];
+          //   }
+          // }
+          // const edgeStyle = JSON.parse(JSON.stringify(tmpStyle));
+          newEdge.style(edgeData.style); // 엣지 스타일 복원
         });
 
         newNode.style(nodeStyle); // 노드 스타일 복원

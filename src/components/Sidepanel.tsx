@@ -24,7 +24,7 @@ function Sidepanel({
   const deferredQuery = useDeferredValue(content);
   const debouncedEdit = debounce(() => {
     saveToServer(cytoInstance);
-  }, 1000);
+  }, 2000);
 
   useEffect(() => {
     if (nodeType === "node")
