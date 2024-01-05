@@ -79,6 +79,9 @@ export function Note() {
       style: cystoConfig.style,
       layout: cystoConfig.layout,
     });
+    cy.current.ready(() => {
+      cy.current.nodes().forEach((node) => console.log(node.classes()));
+    });
 
     for (let i = 0; i < 100; i++) {
       const edgeStyle = {
@@ -154,7 +157,7 @@ export function Note() {
     cy.current.on("select", "node", (event) => {
       const node = event.target;
 
-      if (!node.classes().length) {
+      if (!node.parent().length) {
         setCollapsed(true);
         node.select();
       } else if (node.classes()[0] !== "tmp") {
@@ -163,13 +166,14 @@ export function Note() {
         node.data("dom").classList.add("selected");
         cy.current!.center(node);
         cy.current!.zoom({ level: 2, position: node.position() });
+
+        setSidePanelContent(() => node.data("dom").textContent);
         setCollapsed(true);
-        setSidePanelContent(node.data("dom").textContent);
         prevNode = node;
 
         node.select();
         node.ungrabify();
-        panelTextAreaRef.current.focus();
+        panelTextAreaRef.current?.focus();
       }
     });
     cy.current.on("unselect", "node", (event) => {

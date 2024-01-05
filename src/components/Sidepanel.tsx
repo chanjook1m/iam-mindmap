@@ -68,6 +68,7 @@ function Sidepanel({
           if (nodeType === "root" && i > 0) return;
           return (
             <button
+              key={menu.class}
               className={menu.class}
               onClick={(e) => {
                 menu.onClick(
