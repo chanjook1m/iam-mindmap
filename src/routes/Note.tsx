@@ -247,7 +247,7 @@ export function Note() {
           } else {
             edgeData.data.target = newNode.id();
           }
-          const savedEdgeClasses = edgeData.data.classes;
+          const savedEdgeClasses = edgeData.classes;
           const newEdge = cy.current!.add({
             group: "edges",
             data: edgeData.data,
