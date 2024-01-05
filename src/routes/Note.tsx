@@ -221,6 +221,7 @@ export function Note() {
             target: edge.target().id(),
           },
           style: edge.style(), // 엣지 스타일 저장
+          classes: edge.classes(),
         })); // 연결된 엣지 정보 저장
         const nodeData = node.data(); // 노드 데이터 저장
         const nodePosition = node.position(); // 노드 위치 저장
@@ -246,6 +247,7 @@ export function Note() {
           } else {
             edgeData.data.target = newNode.id();
           }
+          const savedEdgeClasses = edgeData.data.classes;
           const newEdge = cy.current!.add({
             group: "edges",
             data: edgeData.data,
@@ -256,8 +258,9 @@ export function Note() {
               delete tmpStyle[key];
             }
           }
-          const edgeStyle = JSON.parse(JSON.stringify(tmpStyle));
+          const edgeStyle = tmpStyle;
           newEdge.style(edgeStyle); // 엣지 스타일 복원
+          newEdge.classes(savedEdgeClasses);
         });
 
         newNode.style(nodeStyle); // 노드 스타일 복원
