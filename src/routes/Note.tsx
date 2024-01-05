@@ -135,7 +135,9 @@ export function Note() {
     };
 
     cy.current.on("cxttap", "node", (evt) => onCxttap(evt));
-    cy.current.on("click", "node", (event) => {
+
+    let prevNode = null;
+    cy.current.on("tap", "node", (event) => {
       const node = event.target;
       if (node.classes()[0] === "tmp") {
         setCollapsed(false);
@@ -152,32 +154,53 @@ export function Note() {
         }
         cy.current?.fit(event.target, 50); // 50 is the padding
         if (collapsed) setCollapsed(false);
-      }
-    });
-    let prevNode = null;
-    cy.current.on("select", "node", (event) => {
-      const node = event.target;
-      console.log(node.classes());
-
-      if (!node.parent().length) {
-        setCollapsed(true);
+      } else if (!node.parent().length) {
+        setTimeout(() => setCollapsed(true), 0);
         node.select();
-      } else if (node.classes()[0] !== "tmp") {
+      } else {
+        console.log("click");
+        node.select();
+        setTimeout(() => setCollapsed(true), 0);
+
         // node.ungrabify();
         prevNode?.data("dom")?.classList.remove("selected");
         node.data("dom").classList.add("selected");
         cy.current!.center(node);
         cy.current!.zoom({ level: 2, position: node.position() });
 
+        console.log(node.data("dom").textContent);
         setSidePanelContent(() => node.data("dom").textContent);
-        setCollapsed(true);
+
         prevNode = node;
 
-        node.select();
-        node.ungrabify();
+        // node.ungrabify();
         panelTextAreaRef.current?.focus();
       }
     });
+
+    // cy.current.on("select", "node", (event) => {
+    //   const node = event.target;
+    //   console.log(node.classes());
+
+    //   if (!node.parent().length) {
+    //     setCollapsed(true);
+    //     node.select();
+    //   } else if (node.classes()[0] !== "tmp") {
+    //     // node.ungrabify();
+    //     prevNode?.data("dom")?.classList.remove("selected");
+    //     node.data("dom").classList.add("selected");
+    //     cy.current!.center(node);
+    //     cy.current!.zoom({ level: 2, position: node.position() });
+
+    //     setSidePanelContent(() => node.data("dom").textContent);
+    //     setCollapsed(true);
+    //     prevNode = node;
+
+    //     node.select();
+    //     node.ungrabify();
+    //     panelTextAreaRef.current?.focus();
+    //   }
+    // });
     cy.current.on("unselect", "node", (event) => {
       const node = event.target;
       node.data("dom")?.classList.remove("selected");
