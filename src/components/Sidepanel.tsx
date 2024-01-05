@@ -26,6 +26,14 @@ function Sidepanel({
     saveToServer(cytoInstance);
   }, 2000);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      onCollapsed(false);
+      const node = cytoInstance.nodes(":selected")[0];
+      node.data("dom")?.classList.remove("selected");
+    }
+  };
+
   useEffect(() => {
     if (nodeType === "node")
       cytoInstance.nodes(":selected")[0].data("dom").textContent = content;
@@ -52,6 +60,7 @@ function Sidepanel({
           className="textarea"
           disabled={nodeType === "root" ? true : false}
           value={nodeType === "root" ? "" : content}
+          onKeyDown={handleKeyDown}
           onFocus={(e) => {
             const value = e.target.value;
             e.target.setSelectionRange(value.length, value.length);
